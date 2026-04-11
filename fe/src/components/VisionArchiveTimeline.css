@@ -1,0 +1,204 @@
+.archiveList {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.50);
+}
+
+.listHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.listTitle {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.listMeta {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+.archiveItem {
+  cursor: pointer;
+  padding: 0 !important;
+  border-bottom: none !important;
+}
+
+.itemCard {
+  width: 100%;
+  padding: 14px 14px;
+  margin: 10px 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+  position: relative;
+}
+
+.itemCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.26);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.10), rgba(34, 197, 94, 0.06));
+}
+
+.itemTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.itemDate {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.itemTag {
+  color: rgba(255, 255, 255, 0.82) !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+}
+
+.itemMid {
+  margin-top: 10px;
+}
+
+.itemVision {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 26px;
+}
+
+.visionStrong {
+  font-weight: 900;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 1), rgba(244, 114, 182, 1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.visionSep {
+  color: rgba(255, 255, 255, 0.60);
+  font-weight: 700;
+}
+
+.itemHint {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.itemArrow {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.detailCard {
+  border-radius: 16px;
+  background: rgba(2, 6, 23, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailKey {
+  color: rgba(226, 232, 240, 0.86);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.detailVal {
+  color: rgba(255, 255, 255, 0.96);
+  font-weight: 800;
+}
+
+.detailVision {
+  font-weight: 900;
+  font-size: 22px;
+  background: linear-gradient(90deg, rgba(34, 197, 94, 1), rgba(56, 189, 248, 1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.detailSep {
+  color: rgba(226, 232, 240, 0.78);
+  margin: 0 10px;
+}
+
+.archiveDrawer .ant-drawer-content {
+  background: radial-gradient(900px 520px at 12% 10%, rgba(56, 189, 248, 0.14), transparent 55%),
+    radial-gradient(900px 520px at 88% 22%, rgba(34, 197, 94, 0.12), transparent 55%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.92)) !important;
+}
+
+.archiveDrawer .ant-drawer-wrapper-body,
+.archiveDrawer .ant-drawer-body {
+  background: transparent !important;
+}
+
+.archiveDrawer .ant-drawer-content-wrapper,
+.archiveDrawer .ant-drawer-content,
+.archiveDrawer .ant-drawer-body,
+.archiveDrawer .ant-drawer-wrapper-body {
+  background-color: transparent !important;
+}
+
+.archiveDrawer .ant-drawer-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.archiveDrawer .ant-drawer-title {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.archiveDrawer .ant-drawer-close {
+  color: rgba(226, 232, 240, 0.78);
+}
+
+.archiveDrawer .ant-drawer-close:hover {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.archiveDrawer .ant-drawer-content-wrapper {
+  backdrop-filter: blur(14px);
+}
+
+.archiveDrawer .ant-drawer-mask {
+  background: rgba(2, 6, 23, 0.72);
+}
+

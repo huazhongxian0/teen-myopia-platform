@@ -1,0 +1,13 @@
+{
+  "server": {
+    "domain": "localhost",
+    "port": 8090,
+    "protocol": "http",
+    "wsProtocol": "ws"
+  },
+  "endpoints": {
+    "wsNative": "/ws-raw",
+    "wsStomp": "/ws",
+    "api": ""
+  }
+}

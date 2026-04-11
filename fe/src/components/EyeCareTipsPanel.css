@@ -1,0 +1,144 @@
+.eyeCareRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.eyeCareTag {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(15, 23, 42, 0.72) !important;
+}
+
+.eyeCareModal .ant-modal-content {
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(2, 6, 23, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 34px 120px rgba(0, 0, 0, 0.66);
+  backdrop-filter: blur(16px);
+}
+
+.eyeCareModal .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 16px 18px;
+}
+
+.eyeCareModal .ant-modal-title {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.eyeCareModal .ant-modal-body {
+  padding: 18px;
+}
+
+.eyeCareModal .ant-modal-close {
+  color: rgba(255, 255, 255, 0.70);
+}
+
+.eyeCareModal .ant-modal-close:hover {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.eyeCareModal .ant-modal-footer {
+  padding: 14px 18px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+}
+
+.eyeCareModalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 2px 14px;
+}
+
+.eyeCareModalTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.74);
+  font-weight: 700;
+}
+
+.eyeCareBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.16);
+  border: 1px solid rgba(59, 130, 246, 0.32);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.eyeCareContentCell {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.eyeCareModal .ant-table {
+  background: transparent;
+}
+
+.eyeCareModal .ant-table-thead > tr > th {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.80);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.eyeCareModal .ant-table-tbody > tr > td {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.eyeCareModal .ant-table-tbody > tr.ant-table-row:hover > td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.eyeCareModal .ant-input,
+.eyeCareModal .ant-input-affix-wrapper,
+.eyeCareModal .ant-input-textarea-affix-wrapper {
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.90) !important;
+}
+
+.eyeCareModal .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.eyeCareModal .ant-btn-default {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.eyeCareModal .ant-btn-default:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.eyeCareModal .ant-btn-primary {
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.95), rgba(59, 130, 246, 0.95));
+  border: none;
+  box-shadow: 0 10px 26px rgba(34, 197, 94, 0.18), 0 10px 26px rgba(59, 130, 246, 0.18);
+}
+
+.eyeCareModal .ant-btn-primary:hover {
+  transform: translateY(-1px);
+}
+

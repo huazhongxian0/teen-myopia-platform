@@ -1,0 +1,190 @@
+.dapRoot {
+  position: relative;
+  min-height: 100vh;
+  padding: 28px 20px 56px;
+  box-sizing: border-box;
+  background: radial-gradient(1200px 900px at 12% 12%, rgba(34, 197, 94, 0.12), transparent 55%),
+    radial-gradient(900px 700px at 92% 22%, rgba(59, 130, 246, 0.12), transparent 55%),
+    radial-gradient(800px 600px at 48% 100%, rgba(236, 72, 153, 0.10), transparent 55%),
+    #0b1220;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.dapBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  opacity: 0.12;
+}
+
+.dapWrap {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dapTopbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.dapTitle {
+  margin: 0 !important;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.96) !important;
+}
+
+.dapSubtitle {
+  display: inline-block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.dapGrid {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .dapGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.dapPanel {
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.45);
+}
+
+.dapPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dapPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.dapPanelMeta {
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 700;
+}
+
+.dapSearch {
+  width: 190px;
+}
+
+.dapPanelHead .ant-input-affix-wrapper,
+.dapPanelHead .ant-input {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.dapPanelHead .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.46);
+}
+
+.dapPanelHead .ant-input-affix-wrapper:hover {
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+.dapPanelHead .ant-input-affix-wrapper-focused {
+  border-color: rgba(34, 197, 94, 0.45) !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12) !important;
+}
+
+.dapBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.16);
+  border: 1px solid rgba(59, 130, 246, 0.32);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.dapDivider {
+  margin: 12px 0 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.dapPanel .ant-table {
+  background: transparent;
+}
+
+.dapPanel .ant-table-thead > tr > th {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.80);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.dapPanel .ant-table-tbody > tr > td {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dapPanel .ant-table-tbody > tr.ant-table-row:hover > td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dapActiveRow > td {
+  background: rgba(56, 189, 248, 0.10) !important;
+}
+
+.dapName {
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.dapTime {
+  color: rgba(255, 255, 255, 0.70);
+}
+
+.dapTag {
+  color: rgba(255, 255, 255, 0.82) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+}
+
+.dapIdTag {
+  color: rgba(255, 255, 255, 0.78) !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 999px !important;
+}
+
+.dapArchiveHead {
+  margin-bottom: 12px;
+}
+
+.dapArchiveTitle {
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.02em;
+}
+
+.dapArchiveSub {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.62);
+}

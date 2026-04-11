@@ -1,0 +1,528 @@
+.ccdRoot {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 520px at 8% 10%, rgba(16, 185, 129, 0.22), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(1000px 520px at 88% 18%, rgba(99, 102, 241, 0.22), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.86), rgba(241, 245, 249, 0.94));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+}
+
+.ccdRoot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.1) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(15, 23, 42, 0.1) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(circle at 30% 10%, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0) 70%);
+}
+
+.ccdGlow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(70px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ccdGlowA {
+  width: 380px;
+  height: 380px;
+  top: -120px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.55), rgba(16, 185, 129, 0) 70%);
+}
+
+.ccdGlowB {
+  width: 320px;
+  height: 320px;
+  bottom: -120px;
+  right: -120px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.55), rgba(99, 102, 241, 0) 70%);
+}
+
+.ccdTopbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 8px 14px 8px;
+}
+
+.ccdTopbarLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ccdBackBtn {
+  border-radius: 12px;
+}
+
+.ccdTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ccdTitle {
+  margin: 0 !important;
+  letter-spacing: 0.2px;
+  color: #0f172a !important;
+}
+
+.ccdStatusTag {
+  margin-inline-end: 0 !important;
+  border-radius: 999px;
+}
+
+.ccdLiveText {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.ccdSubtitle {
+  display: block;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.ccdTopbarRight {
+  justify-content: flex-end;
+}
+
+.ccdBtnStart {
+  border-radius: 12px;
+  box-shadow: 0 10px 22px rgba(16, 185, 129, 0.18);
+}
+
+.ccdBtnStop {
+  border-radius: 12px;
+}
+
+.ccdGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 14px;
+}
+
+@media (max-width: 1100px) {
+  .ccdGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ccdVideoCard {
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.92));
+  box-shadow: 0 10px 34px rgba(15, 23, 42, 0.12);
+}
+
+.ccdVideoCard .ant-card-body {
+  padding: 14px;
+}
+
+.ccdVideoShell {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.ccdVideoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px 10px 12px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.ccdVideoHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ccdDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.16) inset;
+}
+
+.ccdDotGreen { background: rgba(16, 185, 129, 0.9); }
+.ccdDotYellow { background: rgba(245, 158, 11, 0.9); }
+.ccdDotRed { background: rgba(239, 68, 68, 0.9); }
+
+.ccdVideoTitle {
+  font-weight: 700;
+  color: rgba(15, 23, 42, 0.78);
+}
+
+.ccdVideoMeta {
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 12px;
+}
+
+.ccdVideoViewport {
+  position: relative;
+  height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 560px at 30% 20%, rgba(34, 197, 94, 0.18), rgba(15, 23, 42, 0) 55%),
+    radial-gradient(900px 520px at 80% 50%, rgba(99, 102, 241, 0.18), rgba(15, 23, 42, 0) 55%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.96));
+}
+
+@media (max-width: 768px) {
+  .ccdVideoViewport {
+    height: 320px;
+  }
+}
+
+.ccdScanLine {
+  position: absolute;
+  inset: -20% 0 auto 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0), rgba(34, 197, 94, 0.18), rgba(34, 197, 94, 0));
+  animation: ccdScan 3.2s linear infinite;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+
+@keyframes ccdScan {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(520px); }
+}
+
+.ccdVideoNoise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.5) 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.35) 0 1px, transparent 1px);
+  background-size: 22px 22px, 28px 28px;
+  animation: ccdNoise 6s ease-in-out infinite;
+}
+
+@keyframes ccdNoise {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(8px, -10px, 0); }
+}
+
+.ccdVideoCenter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.ccdReticle {
+  width: min(62%, 420px);
+  height: min(42%, 260px);
+  border-radius: 18px;
+  border: 1px solid rgba(34, 197, 94, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.45) inset,
+    0 0 40px rgba(34, 197, 94, 0.18);
+  position: relative;
+}
+
+.ccdReticle::before,
+.ccdReticle::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 14px;
+  border: 1px dashed rgba(99, 102, 241, 0.42);
+  opacity: 0.9;
+}
+
+.ccdReticle::after {
+  inset: 22px;
+  border-style: solid;
+  border-color: rgba(34, 197, 94, 0.22);
+  opacity: 0.7;
+}
+
+.ccdVideoHint {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  max-width: 520px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  backdrop-filter: blur(14px);
+}
+
+.ccdHintTitle {
+  color: rgba(226, 232, 240, 0.98);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.ccdHintDesc {
+  margin-top: 4px;
+  color: rgba(203, 213, 225, 0.86);
+  line-height: 1.6;
+  font-size: 12px;
+}
+
+.ccdOverlay {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.ccdOverlayItem {
+  width: 170px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.ccdOverlayKey {
+  color: rgba(203, 213, 225, 0.76);
+  font-size: 12px;
+}
+
+.ccdOverlayVal {
+  margin-top: 4px;
+  color: rgba(226, 232, 240, 0.98);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ccdSide {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ccdMetricCard,
+.ccdHistoryCard,
+.ccdGuideCard {
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.96));
+  box-shadow: 0 10px 34px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.ccdMetricCard .ant-card-body,
+.ccdGuideCard .ant-card-body {
+  padding: 14px;
+}
+
+.ccdMetricHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ccdMetricLabel {
+  color: rgba(15, 23, 42, 0.68);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.ccdMetricValue {
+  margin-top: 6px;
+  font-size: 44px;
+  line-height: 1.05;
+  font-weight: 900;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.ccdMetricPill {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(99, 102, 241, 0.16));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: rgba(15, 23, 42, 0.78);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.ccdMetricFoot {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.ccdMetricSub {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.ccdMetricSubKey {
+  color: rgba(15, 23, 42, 0.68);
+  font-weight: 700;
+}
+
+.ccdMetricSubVal {
+  color: rgba(15, 23, 42, 0.72);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ccdErrorBox {
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+}
+
+.ccdErrorTitle {
+  font-weight: 900;
+  color: rgba(190, 18, 60, 0.9);
+}
+
+.ccdErrorDesc {
+  margin-top: 4px;
+  color: rgba(15, 23, 42, 0.72);
+  line-height: 1.6;
+  font-size: 12px;
+}
+
+.ccdHistoryCard .ant-card-head {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.ccdHistoryCard .ant-card-head-title {
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.78);
+}
+
+.ccdHistoryCard .ant-card-body {
+  padding: 12px 14px 14px 14px;
+}
+
+.ccdEmptyHistory {
+  padding: 10px 4px;
+}
+
+.ccdHistoryList {
+  display: grid;
+  gap: 10px;
+}
+
+.ccdHistoryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  border-radius: 16px;
+  background: rgba(2, 6, 23, 0.02);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ccdHistoryItem:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.ccdHistoryLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.ccdHistoryCount {
+  font-size: 26px;
+  font-weight: 900;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.ccdHistoryUnit {
+  color: rgba(15, 23, 42, 0.62);
+  font-weight: 700;
+}
+
+.ccdHistoryRight {
+  text-align: right;
+}
+
+.ccdHistoryTime {
+  font-weight: 800;
+  color: rgba(15, 23, 42, 0.72);
+}
+
+.ccdHistoryHint {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.ccdGuideItem {
+  padding: 12px 12px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ccdGuideNum {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.82);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.ccdGuideText {
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.72);
+  letter-spacing: 0.2px;
+}
