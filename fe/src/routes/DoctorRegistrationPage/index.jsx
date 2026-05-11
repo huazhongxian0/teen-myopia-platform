@@ -330,53 +330,60 @@ export default function DoctorRegistrationPage({ onLogout }) {
         onCancel={() => setExamOpen(false)}
         onOk={handleSubmitExam}
         confirmLoading={submitting}
+        rootClassName="examModalRoot"
         okButtonProps={{ className: 'primaryBtn' }}
       >
-        <Form layout="vertical" form={examForm}>
-          <Form.Item
-            label="左眼视力"
-            name="od"
-            rules={[
-              { required: true, message: '请输入左眼视力' },
-              {
-                validator: (_, v) => {
-                  const n = Number(v)
-                  if (!Number.isFinite(n) || n < 0 || n > 10) return Promise.reject(new Error('请输入 0.0 ~ 10.0 之间的数值'))
-                  return Promise.resolve()
+        <div className="examModalBody">
+          <div className="examModalIntro">
+            <div className="examModalEyebrow">检查录入</div>
+            <div className="examModalHint">录入后将生成该学生的诊断记录，并同步更新当前视力档案。</div>
+          </div>
+          <Form layout="vertical" form={examForm} className="examModalForm">
+            <Form.Item
+              label="左眼视力"
+              name="od"
+              rules={[
+                { required: true, message: '请输入左眼视力' },
+                {
+                  validator: (_, v) => {
+                    const n = Number(v)
+                    if (!Number.isFinite(n) || n < 0 || n > 10) return Promise.reject(new Error('请输入 0.0 ~ 10.0 之间的数值'))
+                    return Promise.resolve()
+                  },
                 },
-              },
-            ]}
-          >
-            <InputNumber min={0} max={10} step={0.1} style={{ width: '100%' }} placeholder="例如 5.0" />
-          </Form.Item>
-          <Form.Item
-            label="右眼视力"
-            name="os"
-            rules={[
-              { required: true, message: '请输入右眼视力' },
-              {
-                validator: (_, v) => {
-                  const n = Number(v)
-                  if (!Number.isFinite(n) || n < 0 || n > 10) return Promise.reject(new Error('请输入 0.0 ~ 10.0 之间的数值'))
-                  return Promise.resolve()
+              ]}
+            >
+              <InputNumber min={0} max={10} step={0.1} style={{ width: '100%' }} placeholder="例如 5.0" />
+            </Form.Item>
+            <Form.Item
+              label="右眼视力"
+              name="os"
+              rules={[
+                { required: true, message: '请输入右眼视力' },
+                {
+                  validator: (_, v) => {
+                    const n = Number(v)
+                    if (!Number.isFinite(n) || n < 0 || n > 10) return Promise.reject(new Error('请输入 0.0 ~ 10.0 之间的数值'))
+                    return Promise.resolve()
+                  },
                 },
-              },
-            ]}
-          >
-            <InputNumber min={0} max={10} step={0.1} style={{ width: '100%' }} placeholder="例如 5.0" />
-          </Form.Item>
+              ]}
+            >
+              <InputNumber min={0} max={10} step={0.1} style={{ width: '100%' }} placeholder="例如 5.0" />
+            </Form.Item>
 
-          <Card className="previewCard" bordered={false}>
-            <div className="previewRow">
-              <div className="previewKey">预览</div>
-              <div className="previewVal">
-                <span className="previewVision">{formatVision(Math.round(Number(odWatch ?? 0) * 10))}</span>
-                <span className="previewSep">/</span>
-                <span className="previewVision">{formatVision(Math.round(Number(osWatch ?? 0) * 10))}</span>
+            <Card className="previewCard examPreviewCard" bordered={false}>
+              <div className="previewRow">
+                <div className="previewKey">视力预览</div>
+                <div className="previewVal">
+                  <span className="previewVision">{formatVision(Math.round(Number(odWatch ?? 0) * 10))}</span>
+                  <span className="previewSep">/</span>
+                  <span className="previewVision">{formatVision(Math.round(Number(osWatch ?? 0) * 10))}</span>
+                </div>
               </div>
-            </div>
-          </Card>
-        </Form>
+            </Card>
+          </Form>
+        </div>
       </Modal>
     </div>
   )

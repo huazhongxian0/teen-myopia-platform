@@ -264,7 +264,7 @@ INSERT INTO `account` (`role_id`, `name`, `account_name`, `password`, `phone_num
 VALUES ('teacher', '李老师', 'teacher', '123456', '18800000002', 'https://example.com/avatar/teacher.png');
 
 INSERT INTO `account` (`role_id`, `name`, `account_name`, `password`, `phone_number`, `avator_url`)
-VALUES ('student', '王同学', 'student', '123456', '18800000003', 'https://example.com/avatar/student.png');
+VALUES ('student', '王一', 'student', '123456', '18800000003', 'https://example.com/avatar/student.png');
 
 INSERT INTO `eyessight` (`od`, `os`, `eyes_time`, `has_glasses`, `people_id`)
 SELECT 0, 0, CAST(UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000 AS UNSIGNED), 0, a.id

@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal, Space, Table, Typography, message } from 'antd'
 import { useState } from 'react'
-import { useAntdTable, useMount } from 'ahooks'
+import { useAntdTable } from 'ahooks'
 import { httpClient } from '../../services/http/index.js'
 import ClassManager from './ClassManager.jsx'
 
@@ -111,12 +111,12 @@ export default function SchoolManager() {
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
       {!selectedSchool ? (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-            <div>
-              <Title level={4} style={{ margin: 0 }}>
+          <div className="backup-managerHeader">
+            <div className="backup-managerLead">
+              <Title level={4} className="backup-managerTitle">
                 学校管理
               </Title>
-              <Text type="secondary">管理学校信息</Text>
+              <Text className="backup-managerMeta">维护学校基础资料，便于后续班级与学生信息统一归档。</Text>
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export default function SchoolManager() {
             form={filterForm}
             layout="inline"
             onFinish={search.submit}
-            style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}
+            className="backup-toolbarCard backup-form"
           >
             <Form.Item name="keyword" label="关键词">
               <Input placeholder="学校名称" allowClear style={{ width: 240 }} />
@@ -145,12 +145,12 @@ export default function SchoolManager() {
               </Space>
             </Form.Item>
           </Form>
-          <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+          <Space className="backup-actionsRow">
             <Button type="primary" onClick={openCreate}>
               新增
             </Button>
           </Space>
-          <Table rowKey="id" columns={columns} {...tableProps} />
+          <Table rowKey="id" columns={columns} className="backup-dataTable" {...tableProps} />
         </>
       ) : (
         <ClassManager 

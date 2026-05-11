@@ -17,6 +17,21 @@ public class SchoolService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    private void ensureEyeSightTable() {
+        jdbcTemplate.execute("""
+                CREATE TABLE IF NOT EXISTS eyessight (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  od BIGINT NOT NULL,
+                  os BIGINT NOT NULL,
+                  eyes_time BIGINT NOT NULL,
+                  has_glasses BOOLEAN NOT NULL DEFAULT 0,
+                  people_id BIGINT NOT NULL,
+                  PRIMARY KEY (id),
+                  UNIQUE KEY uk_eyessight_people_id (people_id)
+                )
+                """);
+    }
+
     public void ensureSchoolTable() {
         jdbcTemplate.execute("""
                 CREATE TABLE IF NOT EXISTS school (
@@ -497,6 +512,97 @@ public class SchoolService {
         }
 
         return new ListTeacherClassesResponse(allClasses);
+    }
+
+    private record AccountRow(long id, String name, String accountName) {
+    }
+
+    private record EyeSightRow(long peopleId, long od, long os, long eyesTime) {
+    }
+
+    public ListTeacherEyeSightResponse listTeacherEyeSight(ListTeacherEyeSightRequest req) {
+        ensureSchoolTable();
+        ensureEyeSightTable();
+
+        Long teacherAccountId = req.teacherAccountId();
+        if (teacherAccountId == null) {
+            throw new IllegalArgumentException("teacherAccountId is required");
+        }
+
+        Long classIdFilter = req.classId();
+        java.util.List<ClassInfoItem> classes = listTeacherClasses(new ListTeacherClassesRequest(teacherAccountId)).list();
+        if (classIdFilter != null) {
+            classes = classes.stream().filter(c -> classIdFilter.equals(c.id())).toList();
+        }
+
+        java.util.List<TeacherEyeSightItem> items = new java.util.ArrayList<>();
+
+        for (ClassInfoItem clazz : classes) {
+            String classTableName = clazz.className();
+            if (classTableName == null || classTableName.isEmpty()) {
+                continue;
+            }
+
+            ensureClassStudentTable(classTableName);
+            List<Long> studentAccountIds = jdbcTemplate.query(
+                    "SELECT account_id FROM `" + classTableName + "`",
+                    (rs, rowNum) -> rs.getLong("account_id")
+            );
+            if (studentAccountIds.isEmpty()) {
+                continue;
+            }
+
+            String placeholders = String.join(",", studentAccountIds.stream().map(_id -> "?").toList());
+            Object[] idArgs = studentAccountIds.toArray();
+
+            List<AccountRow> accountRows = jdbcTemplate.query(
+                    "SELECT id, name, account_name FROM account WHERE id IN (" + placeholders + ")",
+                    (rs, rowNum) -> new AccountRow(
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getString("account_name")
+                    ),
+                    idArgs
+            );
+            java.util.Map<Long, String> idToName = new java.util.HashMap<>();
+            for (AccountRow a : accountRows) {
+                String n = a.name();
+                if (n == null || n.isBlank()) {
+                    n = a.accountName();
+                }
+                idToName.put(a.id(), n != null && !n.isBlank() ? n : String.valueOf(a.id()));
+            }
+
+            List<EyeSightRow> eyeRows = jdbcTemplate.query(
+                    "SELECT people_id, od, os, eyes_time FROM eyessight WHERE people_id IN (" + placeholders + ")",
+                    (rs, rowNum) -> new EyeSightRow(
+                            rs.getLong("people_id"),
+                            rs.getLong("od"),
+                            rs.getLong("os"),
+                            rs.getLong("eyes_time")
+                    ),
+                    idArgs
+            );
+            java.util.Map<Long, EyeSightRow> idToEye = new java.util.HashMap<>();
+            for (EyeSightRow e : eyeRows) {
+                idToEye.put(e.peopleId(), e);
+            }
+
+            for (Long studentAccountId : studentAccountIds) {
+                EyeSightRow e = idToEye.get(studentAccountId);
+                items.add(new TeacherEyeSightItem(
+                        clazz.id(),
+                        clazz.name(),
+                        studentAccountId,
+                        idToName.getOrDefault(studentAccountId, String.valueOf(studentAccountId)),
+                        e == null ? null : e.od(),
+                        e == null ? null : e.os(),
+                        e == null ? null : e.eyesTime()
+                ));
+            }
+        }
+
+        return new ListTeacherEyeSightResponse(items);
     }
 
     private static int normalizePageNo(Integer v) {

@@ -1,4 +1,4 @@
-import { Layout, Tabs, Typography } from 'antd'
+import { Button, Layout, Tabs, Typography } from 'antd'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useMount } from 'ahooks'
 import LogoutEntry from '../../components/LogoutEntry.jsx'
@@ -47,6 +47,9 @@ export default function AllBackUp({ account, onLogout }) {
           </Text>
         </div>
         <div className="header-right">
+          <Button className="backup-back-btn" onClick={() => navigate('/main')}>
+            返回总览
+          </Button>
           <LogoutEntry as="a" onLogout={onLogout} className="logout-btn">
             退出登录
           </LogoutEntry>

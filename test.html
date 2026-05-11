@@ -1,0 +1,114 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="登录模块时序图">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="2" value="用户" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="110" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="3" value="登录页面&#xa;Login.jsx" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="20" width="120" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="4" value="浏览器本地存储" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="20" width="120" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="5" value="前端网络层&#xa;httpClient" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="20" width="120" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="6" value="用户控制器&#xa;UserController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="20" width="130" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="7" value="认证服务&#xa;AuthService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="20" width="120" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="8" value="账号仓库&#xa;AccountRepository" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="20" width="130" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="9" value="权限数据源" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="20" width="110" height="580" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="20" value="1. 访问登录页" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.10;entryX=0;entryY=0.10;" edge="1" parent="1" source="2" target="3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="21" value="2. 读取 account 与 access_token" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.17;entryX=0;entryY=0.17;" edge="1" parent="1" source="3" target="4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="22" value="3. 返回缓存账号与令牌状态" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.24;entryX=1;entryY=0.24;" edge="1" parent="1" source="4" target="3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="23" value="4. 存在令牌时发起 POST /api/users/token/verify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.31;entryX=0;entryY=0.31;" edge="1" parent="1" source="3" target="5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="24" value="5. 转发令牌校验请求" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.31;entryX=0;entryY=0.31;" edge="1" parent="1" source="5" target="6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="25" value="6. verifyToken(token)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.38;entryX=0;entryY=0.38;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="26" value="7. findById(accountId)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.45;entryX=0;entryY=0.45;" edge="1" parent="1" source="7" target="8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="27" value="8. 返回账号实体" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.52;entryX=1;entryY=0.52;" edge="1" parent="1" source="8" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="28" value="9. 加载角色权限点" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.59;entryX=0;entryY=0.59;" edge="1" parent="1" source="7" target="9">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="29" value="10. 返回权限集合" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.66;entryX=1;entryY=0.66;" edge="1" parent="1" source="9" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="30" value="11. 返回 AuthResult" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.73;entryX=1;entryY=0.73;" edge="1" parent="1" source="7" target="6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="31" value="12. 返回 200 与 AuthResponse，或返回 401" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.80;entryX=1;entryY=0.80;" edge="1" parent="1" source="6" target="5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="32" value="13. 自动登录成功后回调 onLoginSuccess，失败则停留登录页" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.87;entryX=1;entryY=0.87;" edge="1" parent="1" source="5" target="3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="33" value="14. 输入账号密码并提交" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.24;entryX=0;entryY=0.94;" edge="1" parent="1" source="2" target="3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="34" value="15. 发起 POST /api/users/login" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.94;entryX=0;entryY=0.94;" edge="1" parent="1" source="3" target="5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="35" value="16. login(req)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.94;entryX=0;entryY=0.94;" edge="1" parent="1" source="5" target="6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="36" value="17. login(LoginInput)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.94;entryX=0;entryY=0.94;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="37" value="18. findByAccountName(accountName)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.94;entryX=0;entryY=0.94;" edge="1" parent="1" source="7" target="8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="38" value="19. 返回账号信息" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.99;entryX=1;entryY=0.99;" edge="1" parent="1" source="8" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="39" value="20. 校验密码，必要时升级密码哈希，并创建令牌" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=0.55;exitY=0.89;entryX=0.55;entryY=0.99;" edge="1" parent="1" source="7" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="40" value="21. 再次加载角色权限点" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.87;entryX=0;entryY=0.87;" edge="1" parent="1" source="7" target="9">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="41" value="22. 返回权限集合" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.94;entryX=1;entryY=0.87;" edge="1" parent="1" source="9" target="7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="42" value="23. 返回 AuthResult" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.80;entryX=1;entryY=0.87;" edge="1" parent="1" source="7" target="6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="43" value="24. 返回 200 与 AuthResponse，或返回 401、400、500" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.94;entryX=1;entryY=0.87;" edge="1" parent="1" source="6" target="5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="44" value="25. 成功则进入已登录态，失败则展示错误信息" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.99;entryX=1;entryY=0.99;" edge="1" parent="1" source="5" target="3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+```登录模块采用“页面初始化会话恢复”与“用户主动提交凭证”并行覆盖的认证设计，进入登录页后，前端组件首先从浏览器本地存储读取历史账号信息与访问令牌，用于预填充登录表单并判断是否具备免登录校验条件；当本地存在令牌时，前端立即通过网络封装向 `/api/users/token/verify` 发起令牌校验请求，后端控制器先从请求头提取承载令牌，再调用认证服务完成令牌签名校验、过期校验以及主体账号解析，随后基于账号标识查询账号仓库确认账户仍然有效，并继续装载当前角色对应的权限点集合，最终将令牌、账号标识、账号名、用户姓名、角色标识和权限点封装为统一认证响应返回前端，前端据此直接触发登录成功回调，从而实现已登录会话的无感恢复；若本地没有令牌，或令牌非法、过期、失效，则页面保持在登录态而不进入业务区。用户主动登录时，交互起点是表单提交事件，前端将账号与密码作为请求体发送到 `/api/users/login`，后端控制器将入参转换为登录输入对象并委派给认证服务，认证服务首先进行账号与密码的非空规范化处理，再依据账号名查询账号仓库获取账户记录，之后执行密码比对逻辑完成身份真实性确认；当账号不存在或密码不匹配时，服务直接抛出无效凭证异常，控制器将其转换为 `401` 未授权响应，前端据此展示“账号或密码错误”的精确反馈；当凭证校验通过时，认证服务还会对历史明文密码执行兼容性升级，在必要场景下将旧密码存储形式改写为哈希值，然后基于当前账号信息生成访问令牌，并装载角色权限点以构建完整的授权上下文，控制器最终以 `200` 状态返回认证结果，前端接收成功响应后调用登录成功回调，将认证态移交给上层应用继续处理页面跳转、会话保存与权限初始化，因此整个登录模块不仅完成了账号密码认证本身，还通过令牌续验、角色权限回填和异常语义分流形成了一个具备连续会话恢复能力、错误反馈清晰且授权信息闭环完整的认证时序结构。

@@ -109,12 +109,12 @@ export default function AuthManager() {
 
   return (
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-        <div>
-          <Title level={4} style={{ margin: 0 }}>
+      <div className="backup-managerHeader">
+        <div className="backup-managerLead">
+          <Title level={4} className="backup-managerTitle">
             权限点管理
           </Title>
-          <Text type="secondary">对应后端 auth 表（id, key）</Text>
+          <Text className="backup-managerMeta">统一维护系统权限点，用于角色授权与访问控制配置。</Text>
         </div>
         <Space>
           <Button onClick={refresh} loading={tableProps.loading}>
@@ -126,7 +126,7 @@ export default function AuthManager() {
         </Space>
       </div>
 
-      <Table rowKey="id" columns={columns} {...tableProps} />
+      <Table rowKey="id" columns={columns} className="backup-dataTable" {...tableProps} />
 
       <Modal
         title={editing ? '编辑权限点' : '新增权限点'}

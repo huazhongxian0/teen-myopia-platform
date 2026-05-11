@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Select, Space, Table, Typography, message } from 'antd'
+import { Button, Form, Modal, Select, Space, Table, Typography, message } from 'antd'
 import { useState } from 'react'
 import { useAntdTable, useMount } from 'ahooks'
 import { httpClient } from '../../services/http/index.js'
@@ -25,7 +25,7 @@ export default function StudentManager({ classInfo, onBack }) {
     void fetchStudents()
   })
 
-  const { tableProps, refresh, search } = useAntdTable(
+  const { tableProps, refresh } = useAntdTable(
     async ({ current, pageSize }) => {
       try {
         const data = await httpClient.post('/api/school/student/list', { 
@@ -104,28 +104,28 @@ export default function StudentManager({ classInfo, onBack }) {
 
   return (
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="backup-managerHeader">
+        <div className="backup-managerLead" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {onBack && (
             <Button onClick={onBack}>
               ← 返回
             </Button>
           )}
           <div>
-            <Title level={4} style={{ margin: 0 }}>
+            <Title level={4} className="backup-managerTitle">
               {classInfo.name} - 学生管理
             </Title>
-            <Text type="secondary">管理班级学生</Text>
+            <Text className="backup-managerMeta">管理班级学生</Text>
           </div>
         </div>
       </div>
 
-      <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+      <Space className="backup-actionsRow">
         <Button type="primary" onClick={openCreate}>
           添加学生
         </Button>
       </Space>
-      <Table rowKey="id" columns={columns} {...tableProps} />
+      <Table rowKey="id" columns={columns} className="backup-dataTable" {...tableProps} />
 
       <Modal
         title="添加学生"

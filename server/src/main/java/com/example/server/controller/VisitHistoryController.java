@@ -160,7 +160,7 @@ public class VisitHistoryController {
             throw new IllegalArgumentException("UNAUTHORIZED");
         }
         AuthService.AuthResult auth = authService.verifyToken(token);
-        if (!"doctor".equals(auth.roleId())) {
+        if (auth.roleId() == null || !"doctor".equalsIgnoreCase(auth.roleId())) {
             throw new IllegalArgumentException("FORBIDDEN");
         }
         return auth;
@@ -172,7 +172,7 @@ public class VisitHistoryController {
             throw new IllegalArgumentException("UNAUTHORIZED");
         }
         AuthService.AuthResult auth = authService.verifyToken(token);
-        if (!"student".equals(auth.roleId())) {
+        if (auth.roleId() == null || !"student".equalsIgnoreCase(auth.roleId())) {
             throw new IllegalArgumentException("FORBIDDEN");
         }
         return auth;

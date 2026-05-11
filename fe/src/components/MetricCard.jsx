@@ -34,7 +34,7 @@ export default function MetricCard({ title, value, description, from, to, sparkW
           <Text type="secondary" className="metricTitle metricTitleText">
             {title}
           </Text>
-          <Title level={2} className="metricValue metricValueText" style={{ margin: 0, color: from.includes('24,144,255') ? '#1677ff' : from.includes('82,196,26') ? '#52c41a' : '#fa8c16' }}>
+          <Title level={2} className="metricValue metricValueText" style={{ margin: 0, color: 'var(--metricFrom)' }}>
             {value}
           </Title>
           <div className="spark" style={{ margin: '8px 0' }}>

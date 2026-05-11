@@ -1,7 +1,9 @@
-import { Col, Row, Space } from 'antd'
+import { Button, Col, Row, Space } from 'antd'
+import { useNavigate } from 'react-router-dom'
 import { useAccount } from '../../hooks/useAccount.js'
-import HeroCard from '../../components/HeroCard.jsx'
+import LogoutButton from '../../components/LogoutButton.jsx'
 import MetricCard from '../../components/MetricCard.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import ShortcutSection from '../../components/ShortcutSection.jsx'
 import EyeCareSection from '../../components/EyeCareSection.jsx'
 import './index.css'
@@ -13,6 +15,7 @@ import './index.css'
  */
 export default function ManagerPage({ onLogout }) {
   const { account, hasPermission } = useAccount()
+  const navigate = useNavigate()
 
   const canManage = hasPermission('manager')
   const displayName = account?.name ?? account?.accountName ?? '-'
@@ -21,11 +24,40 @@ export default function ManagerPage({ onLogout }) {
   return (
     <div className="homeRoot">
       <Space direction="vertical" size={24} className="homeWrap">
-        <HeroCard 
-          canManage={canManage} 
-          displayName={displayName} 
-          roleId={roleId} 
-          onLogout={onLogout} 
+        <PageHeader
+          className="heroCard softCard section delay1"
+          avatar={(
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 16,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 32,
+                background: 'linear-gradient(135deg, rgba(91, 61, 245, 0.94), rgba(47, 107, 255, 0.94))',
+                boxShadow: '0 10px 24px rgba(15, 23, 42, 0.12)',
+              }}
+            >
+              🛡️
+            </div>
+          )}
+          title={`欢迎，${displayName}`}
+          subtitle={`管理员端 · ${roleId}`}
+          actions={(
+            <>
+              <Button
+                size="middle"
+                type="primary"
+                disabled={!canManage}
+                onClick={() => navigate('/allback/auth')}
+              >
+                进入管理平台
+              </Button>
+              <LogoutButton onLogout={onLogout} />
+            </>
+          )}
         />
 
         <Row gutter={[20, 20]}>

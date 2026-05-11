@@ -163,18 +163,18 @@ export default function ClassManager({ school, onBack }) {
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
       {!selectedClass ? (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="backup-managerHeader">
+            <div className="backup-managerLead" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {onBack && (
                 <Button onClick={onBack}>
                   ← 返回
                 </Button>
               )}
               <div>
-                <Title level={4} style={{ margin: 0 }}>
+                <Title level={4} className="backup-managerTitle">
                   {school ? `${school.name} - 班级管理` : '班级管理'}
                 </Title>
-                <Text type="secondary">管理班级信息</Text>
+                <Text className="backup-managerMeta">管理班级信息</Text>
               </div>
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function ClassManager({ school, onBack }) {
             form={filterForm}
             layout="inline"
             onFinish={search.submit}
-            style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}
+            className="backup-toolbarCard backup-form"
           >
             <Form.Item name="keyword" label="关键词">
               <Input placeholder="班级名称" allowClear style={{ width: 240 }} />
@@ -205,13 +205,13 @@ export default function ClassManager({ school, onBack }) {
             </Form.Item>
           </Form>
           {school && (
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+            <Space className="backup-actionsRow">
               <Button type="primary" onClick={openCreate}>
                 新增
               </Button>
             </Space>
           )}
-          <Table rowKey="id" columns={columns} {...tableProps} />
+          <Table rowKey="id" columns={columns} className="backup-dataTable" {...tableProps} />
         </>
       ) : (
         selectedPanel === 'camera' ? (

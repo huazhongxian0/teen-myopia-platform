@@ -238,12 +238,12 @@ export default function RoleManager() {
 
   return (
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-        <div>
-          <Title level={4} style={{ margin: 0 }}>
+      <div className="backup-managerHeader">
+        <div className="backup-managerLead">
+          <Title level={4} className="backup-managerTitle">
             角色管理
           </Title>
-          <Text type="secondary">创建角色会自动创建 user_{'{roleId}'} 权限表</Text>
+          <Text className="backup-managerMeta">配置系统角色与权限范围，建立清晰的后台使用边界。</Text>
         </div>
         <Space>
           <Button onClick={refreshRoles} loading={roleTableProps.loading}>
@@ -257,15 +257,17 @@ export default function RoleManager() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 12, width: '100%' }}>
         <Card
+          className="backup-panelCard"
           size="small"
-          title="角色列表"
-          extra={selectedRoleId ? <Text type="secondary">当前：{selectedRoleId}</Text> : null}
+          title={<span className="backup-panelTitle">角色列表</span>}
+          extra={selectedRoleId ? <Text className="backup-managerMeta">当前：{selectedRoleId}</Text> : null}
           bodyStyle={{ padding: 12 }}
         >
           <Form
             form={roleSearchForm}
             layout="inline"
             onFinish={roleSearch.submit}
+            className="backup-form"
             style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}
           >
             <Form.Item name="roleId" label="角色">
@@ -283,12 +285,13 @@ export default function RoleManager() {
             </Form.Item>
           </Form>
 
-          <Table rowKey="roleId" columns={roleColumns} {...roleTableProps} />
+          <Table rowKey="roleId" columns={roleColumns} className="backup-dataTable" {...roleTableProps} />
         </Card>
 
         <Card
+          className="backup-panelCard"
           size="small"
-          title="角色权限"
+          title={<span className="backup-panelTitle">角色权限</span>}
           extra={
             <Space>
               <Button onClick={refreshPerms} disabled={!selectedRoleId} loading={permTableProps.loading}>
@@ -305,6 +308,7 @@ export default function RoleManager() {
             form={permSearchForm}
             layout="inline"
             onFinish={permSearch.submit}
+            className="backup-form"
             style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}
           >
             <Form.Item name="keyword" label="关键词">
@@ -321,7 +325,7 @@ export default function RoleManager() {
               </Space>
             </Form.Item>
           </Form>
-          <Table rowKey="id" columns={permColumns} {...permTableProps} />
+          <Table rowKey="id" columns={permColumns} className="backup-dataTable" {...permTableProps} />
         </Card>
       </div>
 

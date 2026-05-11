@@ -11,9 +11,11 @@ import {
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAccount } from '../../hooks/useAccount.js'
-import LogoutEntry from '../../components/LogoutEntry.jsx'
 import EyeCareTipsPanel from '../../components/EyeCareTipsPanel.jsx'
 import { httpClient } from '../../services/http/index.js'
+import LogoutButton from '../../components/LogoutButton.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
+import StatSummaryCard from '../../components/StatSummaryCard.jsx'
 import './index.css'
 
 const { Title, Text } = Typography
@@ -201,85 +203,50 @@ export default function StudentPage({ onLogout }) {
       <div className="decoration decoration-2" />
       
       <Space direction="vertical" size={24} className="pageWrap">
-        <Card className="heroCard" bordered={false}>
-          <div className="heroContent">
-            <div className="heroLeft">
-              <Avatar size={64} icon={<UserOutlined />} className="userAvatar" />
-              <div>
-                <Title level={3} style={{ margin: 0, color: '#1e293b' }}>
-                  你好，{displayName}同学！
-                </Title>
-                <div className="roleTagWrapper">
-                  <Text className="roleTag">
-                    {roleId === 'student' ? '学生端' : roleId}
-                  </Text>
-                </div>
-              </div>
+        <PageHeader
+          className="heroCard"
+          avatar={<Avatar size={64} icon={<UserOutlined />} className="userAvatar" />}
+          title={`你好，${displayName}同学！`}
+          subtitle={(
+            <div className="roleTagWrapper">
+              <Text className="roleTag">{roleId === 'student' ? '学生端' : roleId}</Text>
             </div>
-            <div className="heroRight">
-              <LogoutEntry
-                type="primary" 
-                ghost 
-                icon={<LogoutOutlined />} 
-                onLogout={onLogout}
-                className="logoutBtn"
-              >
-                退出登录
-              </LogoutEntry>
-            </div>
-          </div>
-        </Card>
+          )}
+          actions={<LogoutButton onLogout={onLogout} />}
+        />
 
         <div className="pageLayout">
           <div className="mainColumn">
             <Row gutter={[20, 20]}>
               <Col xs={24} md={8}>
-                <Card className="statCard statCard-blue" bordered={false}>
-                  <div className="statCardContent">
-                    <div className="statIconWrapper">
-                      <BarChartOutlined className="statIcon" />
-                    </div>
-                    <div className="statInfo">
-                      <Text className="statLabel">最近视力 (左/右)</Text>
-                      <Title level={2} className="statValue">{recentVisionText}</Title>
-                    </div>
-                  </div>
-                  <div className="statDecoration">
-                    <BarChartOutlined />
-                  </div>
-                </Card>
+                <StatSummaryCard
+                  className="statCard statCard-blue"
+                  bordered={false}
+                  icon={<BarChartOutlined className="statIcon" />}
+                  label="最近视力 (左/右)"
+                  value={<Title level={2} className="statValue">{recentVisionText}</Title>}
+                  decoration={<BarChartOutlined />}
+                />
               </Col>
               <Col xs={24} md={8}>
-                <Card className="statCard statCard-green" bordered={false}>
-                  <div className="statCardContent">
-                    <div className="statIconWrapper">
-                      <CalendarOutlined className="statIcon" />
-                    </div>
-                    <div className="statInfo">
-                      <Text className="statLabel">下次复查</Text>
-                      <Title level={2} className="statValue">2024-06-15</Title>
-                    </div>
-                  </div>
-                  <div className="statDecoration">
-                    <CalendarOutlined />
-                  </div>
-                </Card>
+                <StatSummaryCard
+                  className="statCard statCard-green"
+                  bordered={false}
+                  icon={<CalendarOutlined className="statIcon" />}
+                  label="下次复查"
+                  value={<Title level={2} className="statValue">2024-06-15</Title>}
+                  decoration={<CalendarOutlined />}
+                />
               </Col>
               <Col xs={24} md={8}>
-                <Card className="statCard statCard-orange" bordered={false}>
-                  <div className="statCardContent">
-                    <div className="statIconWrapper">
-                      <LineChartOutlined className="statIcon" />
-                    </div>
-                    <div className="statInfo">
-                      <Text className="statLabel">视力趋势</Text>
-                      <Title level={2} className="statValue">稳定</Title>
-                    </div>
-                  </div>
-                  <div className="statDecoration">
-                    <LineChartOutlined />
-                  </div>  
-                </Card>
+                <StatSummaryCard
+                  className="statCard statCard-orange"
+                  bordered={false}
+                  icon={<LineChartOutlined className="statIcon" />}
+                  label="视力趋势"
+                  value={<Title level={2} className="statValue">稳定</Title>}
+                  decoration={<LineChartOutlined />}
+                />
               </Col>
             </Row>
 

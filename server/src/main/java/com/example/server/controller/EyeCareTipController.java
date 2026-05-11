@@ -99,7 +99,7 @@ public class EyeCareTipController {
             throw new IllegalArgumentException("UNAUTHORIZED");
         }
         AuthService.AuthResult auth = authService.verifyToken(token);
-        if (!"doctor".equals(auth.roleId())) {
+        if (auth.roleId() == null || !"doctor".equalsIgnoreCase(auth.roleId())) {
             throw new IllegalArgumentException("FORBIDDEN");
         }
     }
@@ -115,4 +115,3 @@ public class EyeCareTipController {
         return null;
     }
 }
-

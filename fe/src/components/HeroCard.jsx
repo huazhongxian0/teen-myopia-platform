@@ -36,7 +36,7 @@ export default function HeroCard({ canManage, displayName, roleId, onLogout }) {
               </div>
 
               <div>
-                <Title level={2} style={{ margin: 0, fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 600 }}>
+                <Title level={2} className="theme-gradient-title" style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 600 }}>
                   区域性近视防控平台
                 </Title>
                 <Text type="secondary" style={{ fontSize: '14px', marginTop: '8px', display: 'block' }}>

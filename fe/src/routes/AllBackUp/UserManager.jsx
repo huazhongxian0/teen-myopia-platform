@@ -159,12 +159,12 @@ export default function UserManager() {
 
   return (
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-        <div>
-          <Title level={4} style={{ margin: 0 }}>
+      <div className="backup-managerHeader">
+        <div className="backup-managerLead">
+          <Title level={4} className="backup-managerTitle">
             账号管理
           </Title>
-          <Text type="secondary">对应后端 account 表（id / role_id / name / account_name / phone_number / avator_url）</Text>
+          <Text className="backup-managerMeta">集中维护系统账号信息，便于按角色分配人员与登录身份。</Text>
         </div>
       </div>
 
@@ -172,7 +172,7 @@ export default function UserManager() {
         form={filterForm}
         layout="inline"
         onFinish={search.submit}
-        style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}
+        className="backup-toolbarCard backup-form"
       >
         <Form.Item name="roleId" label="角色">
           <Input placeholder="例如 admin" allowClear style={{ width: 180 }} />
@@ -202,12 +202,12 @@ export default function UserManager() {
           </Space>
         </Form.Item>
       </Form>
-      <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+      <Space className="backup-actionsRow">
           <Button type="primary" onClick={openCreate}>
             新增
           </Button>
         </Space>
-      <Table rowKey="id" columns={columns} {...tableProps} />
+      <Table rowKey="id" columns={columns} className="backup-dataTable" {...tableProps} />
 
       <Modal
         title={editing ? '编辑账号' : '新增账号'}

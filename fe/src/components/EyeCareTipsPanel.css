@@ -73,8 +73,8 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(59, 130, 246, 0.16);
-  border: 1px solid rgba(59, 130, 246, 0.32);
+  background: rgba(91, 61, 245, 0.16);
+  border: 1px solid rgba(91, 61, 245, 0.32);
   color: rgba(255, 255, 255, 0.88);
 }
 
@@ -133,12 +133,11 @@
 
 .eyeCareModal .ant-btn-primary {
   border-radius: 12px;
-  background: linear-gradient(90deg, rgba(34, 197, 94, 0.95), rgba(59, 130, 246, 0.95));
+  background: linear-gradient(90deg, rgba(91, 61, 245, 0.96), rgba(47, 107, 255, 0.95), rgba(0, 194, 168, 0.92));
   border: none;
-  box-shadow: 0 10px 26px rgba(34, 197, 94, 0.18), 0 10px 26px rgba(59, 130, 246, 0.18);
+  box-shadow: 0 10px 26px rgba(91, 61, 245, 0.18), 0 10px 26px rgba(47, 107, 255, 0.18);
 }
 
 .eyeCareModal .ant-btn-primary:hover {
   transform: translateY(-1px);
 }
-

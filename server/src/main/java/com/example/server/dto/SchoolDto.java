@@ -103,4 +103,24 @@ public class SchoolDto {
 
     public record SuccessResponse(boolean success) {
     }
+
+    public record ListTeacherEyeSightRequest(
+            @JsonAlias({"teacherAccountId", "teacher_account_id"}) Long teacherAccountId,
+            @JsonAlias({"classId", "class_id"}) Long classId
+    ) {
+    }
+
+    public record TeacherEyeSightItem(
+            @JsonAlias({"classId", "class_id"}) Long classId,
+            @JsonAlias({"className", "class_name"}) String className,
+            @JsonAlias({"studentAccountId", "student_account_id"}) Long studentAccountId,
+            @JsonAlias({"studentName", "student_name"}) String studentName,
+            Long od,
+            Long os,
+            @JsonAlias({"eyesTime", "eyes_time"}) Long eyesTime
+    ) {
+    }
+
+    public record ListTeacherEyeSightResponse(List<TeacherEyeSightItem> list) {
+    }
 }

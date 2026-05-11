@@ -4,10 +4,10 @@
   padding: 28px 20px 56px;
   box-sizing: border-box;
   font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, -apple-system, sans-serif;
-  background: radial-gradient(1100px 840px at 12% 15%, rgba(56, 189, 248, 0.14), transparent 58%),
-    radial-gradient(900px 720px at 88% 22%, rgba(34, 197, 94, 0.12), transparent 60%),
-    radial-gradient(860px 720px at 40% 100%, rgba(244, 114, 182, 0.10), transparent 58%),
-    #070a12;
+  background:
+    radial-gradient(1200px 820px at 12% 12%, #1a2850 0 22%, #101a35 22% 52%, #08101f 52% 100%),
+    radial-gradient(980px 760px at 88% 18%, #221f4c 0 18%, #111937 18% 50%, #08101f 50% 100%),
+    linear-gradient(180deg, #101933, #08101f);
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -16,21 +16,22 @@
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.06), transparent 40%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05), transparent 42%),
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(#15213c 1px, transparent 1px),
+    linear-gradient(90deg, #15213c 1px, transparent 1px);
   background-size: auto, auto, 64px 64px, 64px 64px;
-  opacity: 0.22;
+  background-size: 56px 56px, 56px 56px;
+  opacity: 0.18;
 }
 
 .archiveNoise {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-  opacity: 0.20;
+  background-image: radial-gradient(circle at 20% 20%, #0d1730 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 40%, #13203b 0 1px, transparent 1px);
+  background-size: 18px 18px, 24px 24px;
+  mix-blend-mode: normal;
+  opacity: 0.08;
 }
 
 .archiveWrap {
@@ -49,7 +50,6 @@
 
 .archiveTitle {
   margin: 0 !important;
-  color: rgba(255, 255, 255, 0.96) !important;
   letter-spacing: 0.04em;
 }
 
@@ -69,7 +69,7 @@
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(135deg, #1b2544, #111a33);
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.50);
 }
 
@@ -81,7 +81,7 @@
   display: inline-flex;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: #1a2442;
   border: 1px solid rgba(255, 255, 255, 0.10);
   color: rgba(255, 255, 255, 0.70);
   letter-spacing: 0.16em;
@@ -99,7 +99,7 @@
 .heroMetric {
   padding: 14px 14px;
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.28);
+  background: #0e162b;
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
@@ -115,7 +115,7 @@
   font-size: 22px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  background: linear-gradient(90deg, rgba(56, 189, 248, 1), rgba(34, 197, 94, 1));
+  background: linear-gradient(90deg, #2f6bff, #5b3df5, #00c2a8);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -130,7 +130,7 @@
 
 .heroTag {
   color: rgba(255, 255, 255, 0.82) !important;
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: #192340 !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 999px !important;
 }
@@ -139,7 +139,7 @@
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.06);
+  background: #121b34;
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.50);
 }
 
@@ -175,7 +175,7 @@
   padding: 14px 14px;
   margin: 10px 0;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(135deg, #1a2443, #11192f);
   border: 1px solid rgba(255, 255, 255, 0.10);
   transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
   position: relative;
@@ -183,8 +183,8 @@
 
 .itemCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.26);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.10), rgba(34, 197, 94, 0.06));
+  border-color: rgba(91, 61, 245, 0.26);
+  background: linear-gradient(135deg, #2b2a58, #19284a);
 }
 
 .itemTop {
@@ -202,7 +202,7 @@
 
 .itemTag {
   color: rgba(255, 255, 255, 0.82) !important;
-  background: rgba(0, 0, 0, 0.28) !important;
+  background: #11192d !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 999px !important;
 }
@@ -220,7 +220,7 @@
 
 .visionStrong {
   font-weight: 900;
-  background: linear-gradient(90deg, rgba(56, 189, 248, 1), rgba(244, 114, 182, 1));
+  background: linear-gradient(90deg, rgba(47, 107, 255, 1), rgba(91, 61, 245, 1));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -246,13 +246,13 @@
   display: grid;
   place-items: center;
   color: rgba(255, 255, 255, 0.86);
-  background: rgba(255, 255, 255, 0.08);
+  background: #1b2441;
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .detailCard {
   border-radius: 16px;
-  background: rgba(2, 6, 23, 0.58);
+  background: #0a1020;
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
@@ -283,7 +283,7 @@
 .detailVision {
   font-weight: 900;
   font-size: 22px;
-  background: linear-gradient(90deg, rgba(34, 197, 94, 1), rgba(56, 189, 248, 1));
+  background: linear-gradient(90deg, rgba(91, 61, 245, 1), rgba(47, 107, 255, 1));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -295,25 +295,23 @@
 }
 
 .archiveDrawer .ant-drawer-content {
-  background: radial-gradient(900px 520px at 12% 10%, rgba(56, 189, 248, 0.14), transparent 55%),
-    radial-gradient(900px 520px at 88% 22%, rgba(34, 197, 94, 0.12), transparent 55%),
-    linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.92)) !important;
+  background: linear-gradient(180deg, #0d1530, #08101f) !important;
 }
 
 .archiveDrawer .ant-drawer-wrapper-body,
 .archiveDrawer .ant-drawer-body {
-  background: transparent !important;
+  background: #08101f !important;
 }
 
 .archiveDrawer .ant-drawer-content-wrapper,
 .archiveDrawer .ant-drawer-content,
 .archiveDrawer .ant-drawer-body,
 .archiveDrawer .ant-drawer-wrapper-body {
-  background-color: transparent !important;
+  background-color: #08101f !important;
 }
 
 .archiveDrawer .ant-drawer-header {
-  background: transparent;
+  background: #0b1226;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
@@ -336,7 +334,7 @@
 }
 
 .archiveDrawer .ant-drawer-mask {
-  background: rgba(2, 6, 23, 0.72);
+  background: #050914;
 }
 
 @media (min-width: 900px) {

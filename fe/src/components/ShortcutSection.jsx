@@ -28,8 +28,8 @@ export default function ShortcutSection({ canManage }) {
                 <div className="shortcutCardBody">
                   <Space direction="vertical" size={8} style={{ width: '100%' }}>
                     <Text strong className="shortcutTitle">近视防控总览</Text>
-                    <Text type="secondary" className="shortcutDescription">快速查看核心指标与风险分布（占位）。</Text>
-                    <Button size="middle" onClick={() => navigate('/main')}>进入</Button>
+                    <Text type="secondary" className="shortcutDescription">查看学校排名、学生检索、筛查趋势与实时班级检测数据。</Text>
+                    <Button size="middle" type="primary" className="primaryGlow" onClick={() => navigate('/main')}>进入</Button>
                   </Space>
                 </div>
               </Card>

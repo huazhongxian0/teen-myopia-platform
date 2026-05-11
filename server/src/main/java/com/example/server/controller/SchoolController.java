@@ -125,4 +125,13 @@ public class SchoolController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/teacher/eyesight/list")
+    public ResponseEntity<ListTeacherEyeSightResponse> listTeacherEyeSight(@RequestBody ListTeacherEyeSightRequest req) {
+        try {
+            return new ResponseEntity<>(schoolService.listTeacherEyeSight(req), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

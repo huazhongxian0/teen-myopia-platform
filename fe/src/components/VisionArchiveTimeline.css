@@ -1,9 +1,17 @@
 .archiveList {
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.50);
+  border: 1px solid #243150;
+  background: linear-gradient(180deg, #151d34, #0b1122);
+  box-shadow: 0 26px 90px #030712;
+}
+
+.archiveList .ant-card-body,
+.archiveList .ant-list,
+.archiveList .ant-list-items,
+.archiveList .ant-spin-nested-loading,
+.archiveList .ant-spin-container {
+  background: #0f162c;
 }
 
 .listHead {
@@ -17,11 +25,11 @@
 .listTitle {
   font-weight: 800;
   letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.90);
+  color: #f8fbff;
 }
 
 .listMeta {
-  color: rgba(255, 255, 255, 0.62);
+  color: #a5b4cf;
   font-size: 12px;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -35,19 +43,21 @@
 
 .itemCard {
   width: 100%;
-  padding: 14px 14px;
+  padding: 16px 16px;
   margin: 10px 0;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #5b3df5, #2f6bff);
+  border: 1px solid #5a7eff;
+  box-shadow: inset 0 1px 0 #8ba6ff, 0 18px 42px #09101e;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
   position: relative;
 }
 
 .itemCard:hover {
-  transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.26);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.10), rgba(34, 197, 94, 0.06));
+  transform: translateY(-3px);
+  border-color: #91acff;
+  background: linear-gradient(135deg, #6a4dff, #3475ff);
+  box-shadow: inset 0 1px 0 #b1c3ff, 0 22px 52px #08111f;
 }
 
 .itemTop {
@@ -60,14 +70,15 @@
 .itemDate {
   font-weight: 800;
   letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.90);
+  color: #ffffff;
 }
 
 .itemTag {
-  color: rgba(255, 255, 255, 0.82) !important;
-  background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #e9f4ff !important;
+  background: #0d1833 !important;
+  border: 1px solid #3c558f !important;
   border-radius: 999px !important;
+  box-shadow: inset 0 1px 0 #23345d;
 }
 
 .itemMid {
@@ -83,20 +94,18 @@
 
 .visionStrong {
   font-weight: 900;
-  background: linear-gradient(90deg, rgba(56, 189, 248, 1), rgba(244, 114, 182, 1));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #eef5ff;
+  text-shadow: 0 0 24px #173b84;
 }
 
 .visionSep {
-  color: rgba(255, 255, 255, 0.60);
+  color: #d5def0;
   font-weight: 700;
 }
 
 .itemHint {
   margin-top: 8px;
-  color: rgba(255, 255, 255, 0.62);
+  color: #d2dcf0;
 }
 
 .itemArrow {
@@ -108,15 +117,16 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  color: rgba(255, 255, 255, 0.86);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #ffffff;
+  background: linear-gradient(135deg, #224fb8, #4f3fcb);
+  border: 1px solid #8ba6ff;
+  box-shadow: inset 0 1px 0 #9fb5ff;
 }
 
 .detailCard {
   border-radius: 16px;
-  background: rgba(2, 6, 23, 0.58);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #0a1020;
+  border: 1px solid #2b3654;
 }
 
 .detailRow {
@@ -124,7 +134,7 @@
   justify-content: space-between;
   align-items: baseline;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #243150;
 }
 
 .detailRow:last-child {
@@ -132,66 +142,61 @@
 }
 
 .detailKey {
-  color: rgba(226, 232, 240, 0.86);
+  color: #d5deef;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   font-size: 12px;
 }
 
 .detailVal {
-  color: rgba(255, 255, 255, 0.96);
+  color: #ffffff;
   font-weight: 800;
 }
 
 .detailVision {
   font-weight: 900;
   font-size: 22px;
-  background: linear-gradient(90deg, rgba(34, 197, 94, 1), rgba(56, 189, 248, 1));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #eaf2ff;
 }
 
 .detailSep {
-  color: rgba(226, 232, 240, 0.78);
+  color: #d5deef;
   margin: 0 10px;
 }
 
 .archiveDrawer .ant-drawer-content {
-  background: radial-gradient(900px 520px at 12% 10%, rgba(56, 189, 248, 0.14), transparent 55%),
-    radial-gradient(900px 520px at 88% 22%, rgba(34, 197, 94, 0.12), transparent 55%),
-    linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.92)) !important;
+  background: linear-gradient(180deg, #0b1122, #060b16) !important;
 }
 
 .archiveDrawer .ant-drawer-wrapper-body,
 .archiveDrawer .ant-drawer-body {
-  background: transparent !important;
+  background: #0b1122 !important;
 }
 
 .archiveDrawer .ant-drawer-content-wrapper,
 .archiveDrawer .ant-drawer-content,
 .archiveDrawer .ant-drawer-body,
 .archiveDrawer .ant-drawer-wrapper-body {
-  background-color: transparent !important;
+  background-color: #0b1122 !important;
 }
 
 .archiveDrawer .ant-drawer-header {
-  background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  background: #0b1122;
+  border-bottom: 1px solid #243150;
 }
 
 .archiveDrawer .ant-drawer-title {
-  color: rgba(255, 255, 255, 0.92);
+  color: #ffffff;
   font-weight: 900;
   letter-spacing: 0.02em;
 }
 
 .archiveDrawer .ant-drawer-close {
-  color: rgba(226, 232, 240, 0.78);
+  color: #d5deef;
 }
 
 .archiveDrawer .ant-drawer-close:hover {
-  color: rgba(255, 255, 255, 0.92);
+  color: #ffffff;
 }
 
 .archiveDrawer .ant-drawer-content-wrapper {
@@ -199,6 +204,42 @@
 }
 
 .archiveDrawer .ant-drawer-mask {
-  background: rgba(2, 6, 23, 0.72);
+  background: #020617;
 }
 
+.archiveList .ant-list-split .ant-list-item {
+  border-block-end: none;
+  background: #0f162c;
+}
+
+.archiveList .ant-pagination-item,
+.archiveList .ant-pagination-prev .ant-pagination-item-link,
+.archiveList .ant-pagination-next .ant-pagination-item-link {
+  background: #11192e;
+  border-color: #243150;
+}
+
+.archiveList .ant-pagination-item a,
+.archiveList .ant-pagination-prev .ant-pagination-item-link,
+.archiveList .ant-pagination-next .ant-pagination-item-link,
+.archiveList .ant-pagination-options,
+.archiveList .ant-select-selection-item,
+.archiveList .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.archiveList .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: #d8e1f2;
+}
+
+.archiveList .ant-pagination-item-active {
+  border-color: #5b3df5;
+  background: #2c2270;
+}
+
+.archiveList .ant-pagination-item-active a {
+  color: #ffffff;
+}
+
+.archiveList .ant-select-selector {
+  background: #11192e !important;
+  border-color: #243150 !important;
+  color: #e2eaf7 !important;
+}

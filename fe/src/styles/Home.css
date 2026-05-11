@@ -4,9 +4,10 @@
   box-sizing: border-box;
   padding: 16px;
   background:
-    radial-gradient(1200px 580px at 10% 8%, rgba(41, 209, 152, 0.3), rgba(255,255,255,0) 60%),
-    radial-gradient(1000px 580px at 90% 15%, rgba(24, 144, 255, 0.3), rgba(255,255,255,0) 60%),
-    linear-gradient(180deg, #f7fbff, #f7f8fb);
+    radial-gradient(1200px 580px at 10% 8%, rgba(91, 61, 245, 0.24), rgba(255,255,255,0) 60%),
+    radial-gradient(1000px 580px at 90% 15%, rgba(47, 107, 255, 0.22), rgba(255,255,255,0) 60%),
+    radial-gradient(980px 560px at 65% 100%, rgba(0, 194, 168, 0.16), rgba(255,255,255,0) 58%),
+    linear-gradient(180deg, #eef3ff, #f5f6ff);
   position: relative;
 }
 
@@ -85,14 +86,14 @@
 .heroGlowA {
   left: -240px;
   top: -280px;
-  background: radial-gradient(circle at 30% 30%, rgba(82,196,26,0.6), rgba(82,196,26,0) 65%);
+  background: radial-gradient(circle at 30% 30%, rgba(91,61,245,0.52), rgba(91,61,245,0) 65%);
   animation-delay: 0s;
 }
 
 .heroGlowB {
   right: -280px;
   top: -340px;
-  background: radial-gradient(circle at 35% 35%, rgba(24,144,255,0.65), rgba(24,144,255,0) 65%);
+  background: radial-gradient(circle at 35% 35%, rgba(47,107,255,0.58), rgba(47,107,255,0) 65%);
   animation-delay: 2s;
 }
 
@@ -135,8 +136,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #52c41a;
-  box-shadow: 0 0 0 4px rgba(82,196,26,0.16);
+  background: #00c2a8;
+  box-shadow: 0 0 0 4px rgba(0,194,168,0.14);
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -204,7 +205,7 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--metricFrom, rgba(24,144,255,0.9)), var(--metricTo, rgba(82,196,26,0.9)));
+  background: linear-gradient(90deg, var(--metricFrom, rgba(47,107,255,0.9)), var(--metricTo, rgba(91,61,245,0.88)));
   opacity: 0.9;
   border-radius: 4px 4px 0 0;
 }
@@ -222,7 +223,7 @@
   height: 100%;
   width: var(--sparkW, 56%);
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--sparkFrom, rgba(24,144,255,0.9)), var(--sparkTo, rgba(82,196,26,0.9)));
+  background: linear-gradient(90deg, var(--sparkFrom, rgba(47,107,255,0.9)), var(--sparkTo, rgba(91,61,245,0.88)));
   animation: sparkGrow 3s ease-in-out infinite alternate;
 }
 
@@ -253,9 +254,9 @@
 }
 
 .primaryGlow.ant-btn-primary {
-  background: linear-gradient(90deg, rgba(24,144,255,0.98), rgba(41,209,152,0.92));
+  background: linear-gradient(90deg, rgba(91,61,245,0.98), rgba(47,107,255,0.94), rgba(0,194,168,0.9));
   border-color: transparent;
-  box-shadow: 0 12px 24px rgba(24, 144, 255, 0.2);
+  box-shadow: 0 14px 28px rgba(91, 61, 245, 0.22);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
@@ -277,15 +278,15 @@
 }
 
 .primaryGlow.ant-btn-primary:not(:disabled):hover {
-  background: linear-gradient(90deg, rgba(24,144,255,1), rgba(41,209,152,0.96));
+  background: linear-gradient(90deg, rgba(74,43,224,1), rgba(47,107,255,0.98), rgba(0,194,168,0.94));
   border-color: transparent;
-  box-shadow: 0 16px 32px rgba(24, 144, 255, 0.25);
+  box-shadow: 0 18px 34px rgba(91, 61, 245, 0.26);
   transform: translateY(-2px) scale(1.02);
 }
 
 .primaryGlow.ant-btn-primary:not(:disabled):active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 8px 16px rgba(24, 144, 255, 0.2);
+  box-shadow: 0 10px 18px rgba(91, 61, 245, 0.2);
 }
 
 .ant-btn {
@@ -324,7 +325,7 @@
   border-radius: 20px;
   background:
     linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.85)),
-    linear-gradient(135deg, rgba(24, 144, 255, 0.12), rgba(82, 196, 26, 0.12));
+    linear-gradient(135deg, rgba(91, 61, 245, 0.12), rgba(47, 107, 255, 0.12));
 }
 
 .actionCardBody {

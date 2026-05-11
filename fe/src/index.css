@@ -1,12 +1,52 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --theme-primary: #5b3df5;
+  --theme-primary-deep: #4a2be0;
+  --theme-secondary: #2f6bff;
+  --theme-accent: #00c2a8;
+  --theme-accent-deep: #00a38d;
+  --theme-warm: #ff8a3d;
+  --theme-warm-soft: rgba(255, 138, 61, 0.16);
+  --theme-danger: #ef4444;
+  --text-primary: #172554;
+  --text-secondary: #51607a;
+  --text-muted: #6f7f99;
+  --surface-base: rgba(255, 255, 255, 0.78);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface-soft: rgba(245, 247, 255, 0.72);
+  --surface-dark: rgba(9, 14, 33, 0.72);
+  --surface-dark-strong: rgba(8, 12, 28, 0.9);
+  --border-soft: rgba(91, 61, 245, 0.12);
+  --border-strong: rgba(47, 107, 255, 0.24);
+  --border-dark: rgba(125, 140, 255, 0.18);
+  --shadow-soft: 0 18px 46px rgba(60, 39, 154, 0.12);
+  --shadow-strong: 0 22px 60px rgba(63, 45, 179, 0.18);
+  --shadow-dark: 0 28px 90px rgba(5, 8, 20, 0.52);
+  --text-dark-main: rgba(244, 247, 255, 0.94);
+  --text-dark-soft: rgba(218, 226, 255, 0.74);
+  --page-background-dark:
+    radial-gradient(circle at 10% 12%, rgba(91, 61, 245, 0.24) 0%, transparent 30%),
+    radial-gradient(circle at 90% 12%, rgba(47, 107, 255, 0.2) 0%, transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(0, 194, 168, 0.14) 0%, transparent 24%),
+    linear-gradient(160deg, #08101f 0%, #0a1328 45%, #07111d 100%);
+  --page-background:
+    radial-gradient(circle at 8% 12%, rgba(91, 61, 245, 0.24) 0%, transparent 30%),
+    radial-gradient(circle at 90% 10%, rgba(47, 107, 255, 0.2) 0%, transparent 28%),
+    radial-gradient(circle at 82% 82%, rgba(0, 194, 168, 0.18) 0%, transparent 26%),
+    radial-gradient(circle at 18% 88%, rgba(255, 138, 61, 0.16) 0%, transparent 24%),
+    linear-gradient(145deg, #eef3ff 0%, #f8f6ff 45%, #f2fcfb 100%);
+  font-family:
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: var(--text-primary);
+  background: #eef3ff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,26 +60,297 @@ body,
   width: 100%;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+html {
+  background: #eef3ff;
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  color: var(--text-primary);
+  background: var(--page-background);
+  background-attachment: fixed;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(91, 61, 245, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 107, 255, 0.04) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.95), transparent 90%);
+  opacity: 0.55;
+}
+
+a {
+  font-weight: 600;
+  color: var(--theme-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+a:hover {
+  color: var(--theme-primary);
+  text-shadow: 0 0 18px rgba(91, 61, 245, 0.16);
+}
+
+::selection {
+  color: #ffffff;
+  background: rgba(91, 61, 245, 0.72);
+}
+
+.ant-layout,
+.ant-app {
+  background: transparent;
+}
+
+.ant-card {
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.ant-card,
+.ant-table,
+.ant-list,
+.ant-popover .ant-popover-inner,
+.ant-dropdown .ant-dropdown-menu,
+.ant-modal .ant-modal-content {
+  background: var(--surface-base);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.ant-btn {
+  font-weight: 600;
+}
+
+.ant-btn-primary {
+  border: none;
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 58%, var(--theme-accent) 100%);
+  box-shadow:
+    0 14px 28px rgba(91, 61, 245, 0.22),
+    0 6px 16px rgba(47, 107, 255, 0.16);
+}
+
+.ant-btn-primary:not(:disabled):hover {
+  background: linear-gradient(135deg, #4e30f0 0%, #2a63ff 58%, #00cdb1 100%) !important;
+  box-shadow:
+    0 18px 34px rgba(91, 61, 245, 0.24),
+    0 8px 18px rgba(47, 107, 255, 0.18) !important;
+}
+
+.ant-btn-default:not(:disabled):hover,
+.ant-btn-link:not(:disabled):hover {
+  color: var(--theme-primary);
+  border-color: rgba(91, 61, 245, 0.28);
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker,
+.ant-input-number,
+.ant-input-number-affix-wrapper {
+  border-color: rgba(91, 61, 245, 0.14) !important;
+}
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover,
+.ant-select:hover .ant-select-selector,
+.ant-picker:hover,
+.ant-input-number:hover,
+.ant-input-number-affix-wrapper:hover {
+  border-color: rgba(91, 61, 245, 0.3) !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused,
+.ant-input-number-focused,
+.ant-input-number-affix-wrapper-focused {
+  box-shadow: 0 0 0 4px rgba(91, 61, 245, 0.12) !important;
+}
+
+.ant-spin .ant-spin-dot-item,
+.ant-badge-status-processing,
+.ant-progress-bg {
+  background: var(--theme-primary);
+}
+
+.theme-gradient-title {
+  margin: 0 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em;
+  color: transparent !important;
+  background-image: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 62%, var(--theme-accent) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.ant-card .ant-card-head-title,
+.ant-modal-root .ant-modal-title,
+.ant-drawer .ant-drawer-title,
+.ant-popconfirm .ant-popconfirm-title,
+.appHeaderTitle,
+.dapTitle,
+.archiveTitle,
+.allTitle,
+.regTitle,
+.ccdTitle,
+.classCardTitle,
+.ccdHistoryTitle,
+.allSectionTitle,
+.regSectionTitle,
+.dapArchiveTitle,
+.dapPanelTitle,
+.actionCardTitleText,
+.shortcutTitle,
+.metricTitleText,
+.cardTitle,
+.eyeCareModalTitle {
+  font-weight: 800 !important;
+  letter-spacing: 0.01em;
+  color: transparent !important;
+  background-image: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 62%, var(--theme-accent) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.theme-card-copy {
+  color: var(--text-secondary) !important;
+}
+
+.appHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.appHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.appHeaderAvatar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appHeaderText {
+  min-width: 0;
+}
+
+.appHeaderTitle {
+  margin: 0 !important;
+}
+
+.appHeaderRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.appLogoutBtn.ant-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(91, 61, 245, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 245, 255, 0.72));
+  box-shadow:
+    0 12px 30px rgba(63, 45, 179, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+  user-select: none;
+}
+
+.appLogoutBtn.ant-btn::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background:
+    radial-gradient(55% 120% at 15% 0%, rgba(91, 61, 245, 0.34), transparent 60%),
+    radial-gradient(55% 120% at 95% 110%, rgba(0, 194, 168, 0.26), transparent 65%);
+  filter: blur(10px);
+  opacity: 0.45;
+  z-index: -1;
+  transition: opacity 0.18s ease, filter 0.18s ease;
+}
+
+.appLogoutBtn.ant-btn::after {
+  content: "→";
+  font-size: 14px;
+  opacity: 0.7;
+  transform: translateX(0);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.appLogoutBtn.ant-btn:not(:disabled):hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 241, 255, 0.74));
+  border-color: rgba(91, 61, 245, 0.3);
+  color: var(--theme-primary);
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 38px rgba(91, 61, 245, 0.16),
+    0 10px 24px rgba(47, 107, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.80);
+}
+
+.appLogoutBtn.ant-btn:not(:disabled):hover::before {
+  opacity: 0.62;
+  filter: blur(12px);
+}
+
+.appLogoutBtn.ant-btn:not(:disabled):hover::after {
+  opacity: 0.85;
+  transform: translateX(3px);
+}
+
+.appLogoutBtn.ant-btn:not(:disabled):active {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 24px rgba(91, 61, 245, 0.12),
+    0 8px 18px rgba(47, 107, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.appLogoutBtn.ant-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(91, 61, 245, 0.18),
+    0 10px 24px rgba(63, 45, 179, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.statCard.ant-card {
+  height: 100%;
+}
+
+.statCard.ant-card .ant-card-body {
+  min-height: 120px;
 }
