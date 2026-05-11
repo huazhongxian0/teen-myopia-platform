@@ -5,6 +5,8 @@ import com.example.server.service.YoloDetectionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Component
 public class RawWebSocketHandler extends TextWebSocketHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(RawWebSocketHandler.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AuthService authService;
     private final YoloDetectionService yoloDetectionService;
@@ -67,6 +70,8 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
+        log.info("[DEBUG] 收到 WebSocket 消息 sessionId={} payload前50字符={}", session.getId(), payload.length() > 50 ? payload.substring(0, 50) + "..." : payload);
+        
         if ("ping".equals(payload)) {
             session.sendMessage(new TextMessage("pong"));
             return;
@@ -146,15 +151,21 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleRealtimeFrame(WebSocketSession session, JsonNode node) {
+        log.info("[DEBUG] handleRealtimeFrame 被调用 sessionId={}", session.getId());
+        
         RealtimeSessionState state = realtimeStates.get(session.getId());
         if (state == null) {
+            log.warn("[DEBUG] 帧被拒绝: realtimeStates 中没有该会话的状态! sessionId={} (可能未先调用 yolo.realtime.start)", session.getId());
             sendError(session, "实时检测尚未启动");
             return;
         }
         if (!state.processing().compareAndSet(false, true)) {
+            log.warn("[DEBUG] 帧被丢弃: 上一帧还在处理中 sessionId={}", session.getId());
             return;
         }
 
+        log.info("[DEBUG] 帧处理开始 sessionId={} classId={}", session.getId(), state.classId());
+        
         CompletableFuture.runAsync(() -> {
             try {
                 verifyLogin(node);
@@ -163,7 +174,9 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
                     throw new IllegalArgumentException("缺少图像帧数据");
                 }
 
+                log.info("[DEBUG] 即将调用 detectFrameDataUrl... frameDataUrl长度={}", frameDataUrl.length());
                 YoloDetectionService.RealtimeDetectResult result = yoloDetectionService.detectFrameDataUrl(frameDataUrl, state.command());
+                log.info("[DEBUG] detectFrameDataUrl 返回成功 requestId={} count={}", result.requestId(), result.count());
                 ObjectNode props = objectMapper.createObjectNode();
                 if (state.classId() != null) {
                     props.put("classId", state.classId());
@@ -178,8 +191,10 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
                 props.set("classCounts", toObjectNode(result.classCounts()));
                 sendKey(session, "yolo:realtime:update", props);
             } catch (IllegalArgumentException e) {
+                log.error("[DEBUG] 帧处理 IllegalArgumentException: {}", e.getMessage());
                 sendError(session, e.getMessage());
             } catch (Exception e) {
+                log.error("[DEBUG] 帧处理异常: ", e);
                 sendError(session, "实时检测失败");
             } finally {
                 state.processing().set(false);

@@ -27,13 +27,54 @@ function formatTime(ts) {
   return d.toLocaleString()
 }
 
+function normalizeClassKey(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '')
+}
+
+function isNegativeGlassesKey(normalizedKey) {
+  return [
+    'noglasses',
+    'withoutglasses',
+    'notwearingglasses',
+    'nowearingglasses',
+    '未戴眼镜',
+    '未佩戴眼镜',
+    '不戴眼镜',
+    '无眼镜',
+    '未戴镜',
+    '未佩戴眼镜者',
+  ].some((keyword) => normalizedKey.includes(keyword))
+}
+
+function isPositiveGlassesKey(normalizedKey) {
+  if (!normalizedKey || isNegativeGlassesKey(normalizedKey)) return false
+  return [
+    'glasses',
+    'glass',
+    'eyeglasses',
+    'wearingglasses',
+    'wearglasses',
+    'withglasses',
+    '戴眼镜',
+    '佩戴眼镜',
+    '戴镜',
+    '眼镜',
+  ].some((keyword) => normalizedKey.includes(keyword))
+}
+
 function pickPrimaryCount(classCounts, totalDetections) {
   const entries = Object.entries(classCounts ?? {})
   for (const [key, value] of entries) {
-    const normalizedKey = String(key).trim().toLowerCase()
-    if (['glasses', 'glass', 'wearing_glasses', 'wearing-glasses', 'eyeglasses'].includes(normalizedKey)) {
+    const normalizedKey = normalizeClassKey(key)
+    if (isPositiveGlassesKey(normalizedKey)) {
       return Math.max(Number(value) || 0, 0)
     }
+  }
+  if (entries.length === 0) {
+    return Math.max(Number(totalDetections) || 0, 0)
   }
   return Math.max(Number(totalDetections) || 0, 0)
 }
@@ -61,6 +102,21 @@ function normalizeUploadResponse(data) {
     detectedAt: Date.now(),
     status: data?.status || '-',
   }
+}
+
+function humanizeDetectionError(text) {
+  const rawText = String(text ?? '').trim()
+  if (!rawText) return '实时检测失败'
+  if (rawText.includes('MODEL_PATH_NOT_CONFIGURED') || rawText.includes('MODEL_FILE_NOT_FOUND')) {
+    return '当前未找到基于 glassess 数据集训练的眼镜识别模型，请先执行 glassess/train_glasses_model.sh 生成 best.pt'
+  }
+  if (rawText.includes('DETECTION_FAILED:')) {
+    return rawText.replace('DETECTION_FAILED:', '').trim() || '模型推理失败'
+  }
+  if (rawText.includes('DETECTION_PROCESS_FAILED:')) {
+    return rawText.replace('DETECTION_PROCESS_FAILED:', '').trim() || '模型进程执行失败'
+  }
+  return rawText
 }
 
 export default function ClassCameraDetectPage({ classInfo, onBack }) {
@@ -170,7 +226,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
         return
       }
       if (key === 'yolo:realtime:error') {
-        const text = props?.message || '实时检测失败'
+        const text = humanizeDetectionError(props?.message || '实时检测失败')
         setErrorText(text)
         return
       }
@@ -235,41 +291,142 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
     return client
   }
 
+  function ensureRealtimeSessionActive(client) {
+    console.log('[前端DEBUG] ensureRealtimeSessionActive 开始检查', { isOpen: client?.isOpen, running: runningRef.current })
+    if (!client?.isOpen) {
+      console.log('[前端DEBUG] ❌ 客户端未打开')
+      return false
+    }
+    if (runningRef.current) {
+      console.log('[前端DEBUG] ✅ 已在运行中，跳过 start')
+      return true
+    }
+    console.log('[前端DEBUG] 📤 发送 yolo.realtime.start...')
+    client.sendJson({
+      type: 'yolo.realtime.start',
+      token,
+      classId,
+      className,
+      conf: 0.25,
+      iou: 0.45,
+      imgsz: 640,
+    })
+    console.log('[前端DEBUG] ✅ start 已发送')
+    return true
+  }
+
   function pushHistory(nextCount, nextAt, source) {
     setHistory((prev) => [{ at: nextAt, count: nextCount, source }, ...prev].slice(0, 10))
   }
 
   async function captureAndSendFrame({ silent = false } = {}) {
-    if (!classId) return
+    console.log('[前端DEBUG] ===== captureAndSendFrame 开始 =====')
+    if (!classId) {
+      console.log('[前端DEBUG] ❌ 没有 classId，退出')
+      return
+    }
     if (!token) {
       const text = '当前登录态无效，请重新登录'
+      console.log('[前端DEBUG] ❌ 没有 token')
       setErrorText(text)
       if (!silent) message.error(text)
       return
     }
     try {
+      console.log('[前端DEBUG] 📷 准备获取摄像头...')
       await ensureCameraReady()
+      console.log('[前端DEBUG] ✅ 摄像头就绪')
+      
+      console.log('[前端DEBUG] 🔌 准备连接 WebSocket...')
       const client = await ensureWsConnected()
+      console.log('[前端DEBUG] ✅ WebSocket 已连接', { isOpen: client.isOpen })
+      
+      console.log('[前端DEBUG] 🎯 确保实时会话活跃...')
+      if (!ensureRealtimeSessionActive(client)) {
+        const text = '实时连接不可用'
+        console.log('[前端DEBUG] ❌ 实时会话激活失败')
+        setErrorText(text)
+        if (!silent) message.error(text)
+        return
+      }
+
+      console.log('[前端DEBUG] ⏳ 等待 300ms 让后端处理 start...')
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      console.log('[前端DEBUG] 🔁 二次检查连接状态...')
+      const client2 = await ensureWsConnected()
+      if (!client2?.isOpen) {
+        const text = 'WebSocket 连接已断开'
+        console.log('[前端DEBUG] ❌ 二次检查发现连接断开')
+        setErrorText(text)
+        if (!silent) message.error(text)
+        return
+      }
+      console.log('[前端DEBUG] ✅ 二次检查通过，连接正常')
+      
       const video = videoRef.current
       const canvas = canvasRef.current
-      if (!video || !canvas) return
+      if (!video || !canvas) {
+        console.log('[前端DEBUG] ❌ video 或 canvas 不存在')
+        return
+      }
       const width = video.videoWidth || 960
       const height = video.videoHeight || 540
       canvas.width = width
       canvas.height = height
       const ctx = canvas.getContext('2d')
-      if (!ctx) return
+      if (!ctx) {
+        console.log('[前端DEBUG] ❌ 无法获取 2d context')
+        return
+      }
       ctx.drawImage(video, 0, 0, width, height)
-      const frameDataUrl = canvas.toDataURL('image/jpeg', 0.82)
-      client.sendJson({
+      const frameDataUrl = canvas.toDataURL('image/jpeg', 0.4)
+      console.log('[前端DEBUG] 📸 帧已捕获，大小:', frameDataUrl.length)
+
+      const frameMessage = {
         type: 'yolo.realtime.frame',
         token,
         classId,
         className,
         frameDataUrl,
+      }
+      const frameJsonStr = JSON.stringify(frameMessage)
+      console.log('[前端DEBUG] 📏 帧消息JSON大小:', frameJsonStr.length, '字节')
+      
+      console.log('[前端DEBUG] 🚀 发送 yolo.realtime.frame...')
+      console.log('[前端DEBUG] 🔍 发送前连接状态:', {
+        readyState: client._ws?.readyState,
+        isOpen: client.isOpen,
+        wsExists: !!client._ws,
+        wsUrl: client._ws?.url
       })
+
+      try {
+        client.sendJson(frameMessage)
+        console.log('[前端DEBUG] ✅ sendJson 执行完成')
+
+        await new Promise(resolve => setTimeout(resolve, 200))
+
+        const postSendStatus = {
+          readyState: client._ws?.readyState,
+          isOpen: client.isOpen,
+          wsExists: !!client._ws,
+          bufferedAmount: client._ws?.bufferedAmount ?? 0
+        }
+        console.log('[前端DEBUG] 🔍 发送后200ms连接状态:', postSendStatus)
+
+        if (!postSendStatus.wsExists || postSendStatus.readyState !== 1) {
+          console.warn('[前端DEBUG] ⚠️ WebSocket 在发送后断开! 可能原因: 后端处理帧时关闭了连接')
+        }
+
+        console.log('[前端DEBUG] ✅ frame 已发送')
+      } catch (sendErr) {
+        console.error('[前端DEBUG] ❌ sendJson 抛出异常:', sendErr.message)
+        throw sendErr
+      }
     } catch (e) {
       const text = e?.message || '发送检测帧失败'
+      console.log('[前端DEBUG] ❌ 异常:', text, e)
       setErrorText(text)
       if (!silent) message.error(text)
     }
@@ -373,7 +530,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
       pushHistory(normalized.count, normalized.detectedAt, '上传检测')
       message.success('视频检测完成')
     } catch (e) {
-      const text = e?.message || '上传检测失败'
+      const text = humanizeDetectionError(e?.message || '上传检测失败')
       setErrorText(text)
       message.error(text)
     } finally {
@@ -445,7 +602,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
               )}
             </div>
             <Text className="ccdSubtitle">
-              {className} · 统计当前画面中戴眼镜同学数量
+              {className} · 基于 glassess 数据集训练模型统计当前画面中戴眼镜同学数量
             </Text>
           </div>
         </div>
@@ -504,8 +661,8 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
                   <div className="ccdHintTitle">{cameraReady ? '摄像头已接入' : '等待接入班级摄像头'}</div>
                   <div className="ccdHintDesc">
                     {cameraReady
-                      ? '页面会按固定频率截取当前画面并通过实时通道发送到后端进行 YOLO 检测'
-                      : '点击“启动检测”后将申请浏览器摄像头权限，并开始实时推送检测'}
+                      ? '页面会实时显示班级摄像头画面，并使用基于 glassess 数据集训练的模型更新戴眼镜人数'
+                      : '点击“启动检测”后将申请浏览器摄像头权限，并开始实时推送到眼镜识别模型'}
                   </div>
                 </div>
               </div>

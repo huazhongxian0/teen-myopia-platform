@@ -55,7 +55,14 @@ coverage
 # Temporary files
 *.tmp
 *.temp
+.png
+.jpg
 .cache
+
+# Dataset archive
+!glassess.zip
+glassess/
+glassess/**
 
 # Package manager files
 package-lock.json

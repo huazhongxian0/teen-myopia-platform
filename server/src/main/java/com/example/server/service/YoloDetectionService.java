@@ -3,6 +3,8 @@ package com.example.server.service;
 import com.example.server.dto.YoloDetectionDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class YoloDetectionService {
+    private static final Logger log = LoggerFactory.getLogger(YoloDetectionService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AtomicReference<Path> extractedScriptPath = new AtomicReference<>();
     private final String pythonExecutable;
@@ -65,6 +68,17 @@ public class YoloDetectionService {
             Path outputDir = Files.createDirectories(requestRoot.resolve("output"));
             video.transferTo(inputPath);
             JsonNode root = runDetection(inputPath, outputDir, requestId, command);
+            Map<String, Integer> classCounts = readClassCounts(root.path("summary").path("classCounts"));
+            int totalFrames = root.path("summary").path("totalFrames").asInt(0);
+            int totalDetections = root.path("summary").path("totalDetections").asInt(0);
+
+            log.info("上传检测完成 requestId={} fileName={} totalFrames={} totalDetections={} glassesCount={} classCounts={}",
+                    requestId,
+                    originalFilename,
+                    totalFrames,
+                    totalDetections,
+                    resolvePrimaryCount(classCounts, totalDetections),
+                    classCounts);
 
             return new YoloDetectionDto.DetectVideoResponse(
                     requestId,
@@ -73,9 +87,9 @@ public class YoloDetectionService {
                     "success",
                     root.path("message").asText("检测完成"),
                     new YoloDetectionDto.DetectionSummary(
-                            root.path("summary").path("totalFrames").asInt(0),
-                            root.path("summary").path("totalDetections").asInt(0),
-                            readClassCounts(root.path("summary").path("classCounts"))
+                            totalFrames,
+                            totalDetections,
+                            classCounts
                     ),
                     new YoloDetectionDto.DetectionArtifact(
                             root.path("artifact").path("inputPath").asText(inputPath.toString()),
@@ -84,16 +98,24 @@ public class YoloDetectionService {
                     )
             );
         } catch (IllegalArgumentException e) {
+            log.error("[DEBUG] detectFrameDataUrl IllegalArgumentException: {}", e.getMessage());
             throw e;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            log.error("[DEBUG] detectFrameDataUrl 中断异常");
             throw new IllegalStateException("DETECTION_INTERRUPTED");
         } catch (IOException e) {
+            log.error("[DEBUG] detectFrameDataUrl IO异常: ", e);
             throw new IllegalStateException("DETECTION_IO_ERROR: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("[DEBUG] detectFrameDataUrl 未知异常: ", e);
+            throw e;
         }
     }
 
     public RealtimeDetectResult detectFrameDataUrl(String frameDataUrl, DetectVideoCommand command) {
+        log.info("[DEBUG] detectFrameDataUrl 入口 frameDataUrl长度={}", frameDataUrl != null ? frameDataUrl.length() : "null");
+        
         String normalizedPayload = normalize(frameDataUrl);
         if (normalizedPayload == null) {
             throw new IllegalArgumentException("EMPTY_FRAME");
@@ -108,10 +130,21 @@ public class YoloDetectionService {
             Path outputDir = Files.createDirectories(requestRoot.resolve("output"));
             Files.write(inputPath, frameBytes);
 
+            log.info("[DEBUG] 帧已写入文件 准备调用 runDetection requestId={} inputPath={}", requestId, inputPath);
+
             JsonNode root = runDetection(inputPath, outputDir, requestId, command);
+            
+            log.info("[DEBUG] runDetection 返回成功 开始解析结果");
+            
             Map<String, Integer> classCounts = readClassCounts(root.path("summary").path("classCounts"));
             int totalDetections = root.path("summary").path("totalDetections").asInt(0);
             int targetCount = resolvePrimaryCount(classCounts, totalDetections);
+
+            log.info("实时检测完成 requestId={} totalDetections={} glassesCount={} classCounts={}",
+                    requestId,
+                    totalDetections,
+                    targetCount,
+                    classCounts);
 
             return new RealtimeDetectResult(
                     requestId,
@@ -283,16 +316,44 @@ public class YoloDetectionService {
             if (key == null) {
                 continue;
             }
-            String normalizedKey = key.trim().toLowerCase();
-            if ("glasses".equals(normalizedKey)
-                    || "glass".equals(normalizedKey)
-                    || "wearing_glasses".equals(normalizedKey)
-                    || "wearing-glasses".equals(normalizedKey)
-                    || "eyeglasses".equals(normalizedKey)) {
+            String normalizedKey = normalizeClassKey(key);
+            if (isPositiveGlassesKey(normalizedKey)) {
                 return Math.max(entry.getValue(), 0);
             }
         }
         return Math.max(totalDetections, 0);
+    }
+
+    private String normalizeClassKey(String value) {
+        return value == null ? "" : value.trim().toLowerCase().replaceAll("[\\s_-]+", "");
+    }
+
+    private boolean isPositiveGlassesKey(String normalizedKey) {
+        if (normalizedKey == null || normalizedKey.isEmpty() || isNegativeGlassesKey(normalizedKey)) {
+            return false;
+        }
+        return normalizedKey.contains("glasses")
+                || normalizedKey.contains("glass")
+                || normalizedKey.contains("eyeglasses")
+                || normalizedKey.contains("wearingglasses")
+                || normalizedKey.contains("wearglasses")
+                || normalizedKey.contains("withglasses")
+                || normalizedKey.contains("戴眼镜")
+                || normalizedKey.contains("佩戴眼镜")
+                || normalizedKey.contains("戴镜")
+                || normalizedKey.contains("眼镜");
+    }
+
+    private boolean isNegativeGlassesKey(String normalizedKey) {
+        return normalizedKey.contains("noglasses")
+                || normalizedKey.contains("withoutglasses")
+                || normalizedKey.contains("notwearingglasses")
+                || normalizedKey.contains("nowearingglasses")
+                || normalizedKey.contains("未戴眼镜")
+                || normalizedKey.contains("未佩戴眼镜")
+                || normalizedKey.contains("不戴眼镜")
+                || normalizedKey.contains("无眼镜")
+                || normalizedKey.contains("未戴镜");
     }
 
     private Path resolveAbsolutePath(String value) {
