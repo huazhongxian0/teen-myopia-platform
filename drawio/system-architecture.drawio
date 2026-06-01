@@ -1,0 +1,435 @@
+<mxfile host="Electron" modified="2026-05-19T00:00:00.000Z" agent="Claude" version="24.0.0" type="device">
+  <diagram id="system-architecture" name="系统架构图">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ==================== 标题 ==================== -->
+        <mxCell id="title" value="Vision Guard 视力健康管理系统 — 系统架构设计图"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontFamily=Helvetica;fontColor=#1565C0;"
+                vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="700" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 表现层 ==================== -->
+        <mxCell id="lane_presentation" value="表现层  Presentation Layer"
+                style="swimlane;horizontal=0;startSize=36;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=15;fontStyle=1;fontFamily=Helvetica;fontColor=#1565C0;swimlaneFillColor=#E3F2FD;"
+                vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="1080" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- 多端入口 -->
+        <mxCell id="pc_browser" value="PC 浏览器"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#1976D2;shadow=1;fontSize=13;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="40" y="55" width="130" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="mobile" value="移动端"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#1976D2;shadow=1;fontSize=13;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="200" y="55" width="110" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- React 应用 -->
+        <mxCell id="react_app" value="React 19 + Vite 前端应用"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#1976D2;strokeColor=#0D47A1;shadow=1;fontSize=14;fontStyle=1;fontColor=#FFFFFF;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="340" y="45" width="220" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- 页面模块 -->
+        <mxCell id="page_login" value="登录页&#xa;Login"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#1976D2;shadow=1;fontSize=12;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="590" y="45" width="110" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="page_home" value="主页&#xa;Home"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#1976D2;shadow=1;fontSize=12;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="720" y="45" width="110" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="page_dashboard" value="主面板&#xa;Dashboard"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#1976D2;shadow=1;fontSize=12;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="850" y="45" width="110" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- UI 组件 -->
+        <mxCell id="ui_components" value="UI 组件库"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontStyle=1;fontColor=#1565C0;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="40" y="130" width="100" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="comp_metric" value="MetricCard"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#64B5F6;shadow=1;fontSize=11;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="150" y="125" width="110" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_eyecare" value="EyeCareTipsPanel"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#64B5F6;shadow=1;fontSize=11;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="275" y="125" width="130" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_chart" value="OverviewChart"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#64B5F6;shadow=1;fontSize=11;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="420" y="125" width="130" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_timeline" value="VisionArchiveTimeline"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#64B5F6;shadow=1;fontSize=11;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="565" y="125" width="155" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_summary" value="StatSummaryCard"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#64B5F6;shadow=1;fontSize=11;fontColor=#1565C0;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="735" y="125" width="135" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- 技术标签 -->
+        <mxCell id="tech_tags" value="Ant Design · ECharts · ahooks · React Router"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#5C6BC0;fontStyle=2;"
+                vertex="1" parent="lane_presentation">
+          <mxGeometry x="40" y="170" width="500" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 接口层 ==================== -->
+        <mxCell id="lane_api" value="接口层  API Layer"
+                style="swimlane;horizontal=0;startSize=36;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;fontSize=15;fontStyle=1;fontFamily=Helvetica;fontColor=#2E7D32;swimlaneFillColor=#E8F5E9;"
+                vertex="1" parent="1">
+          <mxGeometry x="60" y="310" width="1080" height="170" as="geometry"/>
+        </mxCell>
+
+        <!-- REST API -->
+        <mxCell id="rest_api" value="REST API 网关&#xa;Spring Web"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#388E3C;shadow=1;fontSize=13;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="40" y="50" width="170" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- WebSocket -->
+        <mxCell id="websocket" value="WebSocket 实时通道&#xa;Spring WS + Raw WS"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#388E3C;shadow=1;fontSize=13;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="240" y="50" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- CORS -->
+        <mxCell id="cors" value="CORS 跨域配置"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#388E3C;shadow=1;fontSize=12;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="450" y="50" width="140" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 角色路由 -->
+        <mxCell id="role_routes" value="多角色路由分发"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontStyle=1;fontColor=#2E7D32;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="630" y="45" width="160" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="role_admin" value="Admin&#xa;管理员"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#81C784;shadow=1;fontSize=11;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="620" y="90" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_doctor" value="Doctor&#xa;医生"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#81C784;shadow=1;fontSize=11;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="735" y="90" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_teacher" value="Teacher&#xa;教师"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#81C784;shadow=1;fontSize=11;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="850" y="90" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_student" value="Student&#xa;学生"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#81C784;shadow=1;fontSize=11;fontColor=#2E7D32;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="965" y="90" width="100" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Controller 列表 -->
+        <mxCell id="controllers_label" value="Controllers:"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#2E7D32;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="40" y="130" width="90" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="ctrl_list" value="AuthController · UserController · VisitRegistrationController · VisitHistoryController · EyeCareTipController · OverviewController · SchoolController · YoloDetectionController · ChatWsController"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#4CAF50;fontStyle=2;"
+                vertex="1" parent="lane_api">
+          <mxGeometry x="130" y="130" width="900" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 业务层 ==================== -->
+        <mxCell id="lane_service" value="业务层  Service Layer"
+                style="swimlane;horizontal=0;startSize=36;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;fontSize=15;fontStyle=1;fontFamily=Helvetica;fontColor=#BF360C;swimlaneFillColor=#FFF3E0;"
+                vertex="1" parent="1">
+          <mxGeometry x="60" y="500" width="1080" height="160" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="svc_auth" value="AuthService&#xa;认证服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#BF360C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="40" y="50" width="130" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc_user" value="UserService&#xa;用户服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#BF360C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="190" y="50" width="130" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc_visit" value="VisitService&#xa;就诊服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#BF360C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="340" y="50" width="130" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc_eyecare" value="EyeCareTipService&#xa;护眼贴士服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#BF360C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="490" y="50" width="140" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc_overview" value="OverviewService&#xa;数据概览服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#BF360C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="650" y="50" width="140" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc_school" value="SchoolService&#xa;学校班级服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#BF360C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="810" y="50" width="130" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc_yolo" value="YoloDetectionService&#xa;AI 检测服务"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FF8F00;strokeColor=#E65100;shadow=1;fontSize=12;fontColor=#FFFFFF;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="960" y="50" width="140" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- DTO -->
+        <mxCell id="dto_label" value="DTO:"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#BF360C;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="40" y="120" width="50" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="dto_list" value="EyeCareTipDto · OverviewDto · SchoolDto · VisitDto · YoloDetectionDto"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#E65100;fontStyle=2;"
+                vertex="1" parent="lane_service">
+          <mxGeometry x="90" y="120" width="650" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 数据层 ==================== -->
+        <mxCell id="lane_data" value="数据层  Data Access Layer"
+                style="swimlane;horizontal=0;startSize=36;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontSize=15;fontStyle=1;fontFamily=Helvetica;fontColor=#4A148C;swimlaneFillColor=#F3E5F5;"
+                vertex="1" parent="1">
+          <mxGeometry x="60" y="680" width="1080" height="160" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="repo_account" value="AccountRepository&#xa;认证仓库"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#7B1FA2;shadow=1;fontSize=11;fontColor=#4A148C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="40" y="50" width="140" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo_user" value="UserRepository&#xa;用户仓库"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#7B1FA2;shadow=1;fontSize=11;fontColor=#4A148C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="200" y="50" width="140" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo_visit_history" value="VisitHistoryRepository&#xa;就诊历史仓库"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#7B1FA2;shadow=1;fontSize=11;fontColor=#4A148C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="360" y="50" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo_visit_reg" value="VisitRegistrationRepo&#xa;就诊登记仓库"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#7B1FA2;shadow=1;fontSize=11;fontColor=#4A148C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="530" y="50" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo_eyecare" value="EyeCareTipRepository&#xa;护眼贴士仓库"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#7B1FA2;shadow=1;fontSize=11;fontColor=#4A148C;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="700" y="50" width="150" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- JPA/Hibernate -->
+        <mxCell id="jpa" value="JPA / Hibernate ORM&#xa;数据持久化框架"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#CE93D8;strokeColor=#7B1FA2;shadow=1;fontSize=12;fontColor=#FFFFFF;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="870" y="50" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- 数据模型 -->
+        <mxCell id="model_label" value="数据模型:"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#4A148C;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="40" y="120" width="90" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="model_list" value="Account · User · ChatMessage · EyeCareTip · VisitHistory · VisitRegistration"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#7B1FA2;fontStyle=2;"
+                vertex="1" parent="lane_data">
+          <mxGeometry x="130" y="120" width="600" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 存储层 ==================== -->
+        <mxCell id="lane_storage" value="存储层  Storage Layer"
+                style="swimlane;horizontal=0;startSize=36;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=15;fontStyle=1;fontFamily=Helvetica;fontColor=#01579B;swimlaneFillColor=#E1F5FE;"
+                vertex="1" parent="1">
+          <mxGeometry x="60" y="860" width="1080" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- MySQL -->
+        <mxCell id="mysql" value="MySQL&#xa;生产数据库"
+                style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0277BD;shadow=1;fontSize=14;fontStyle=1;fontColor=#01579B;align=center;verticalAlign=middle;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="100" y="50" width="170" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- H2 -->
+        <mxCell id="h2" value="H2&#xa;开发/内存数据库"
+                style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0277BD;shadow=1;fontSize=14;fontStyle=1;fontColor=#01579B;align=center;verticalAlign=middle;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="320" y="50" width="170" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- 数据表 -->
+        <mxCell id="tables_label" value="数据表:"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontStyle=1;fontColor=#01579B;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="540" y="45" width="80" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_auth" value="auth"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="620" y="45" width="80" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_role" value="role"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="715" y="45" width="80" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_user" value="user"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="810" y="45" width="80" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_visit_h" value="visit_history"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="905" y="45" width="100" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_visit_r" value="visit_registration"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="620" y="85" width="120" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_eyecare" value="eye_care_tip"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="755" y="85" width="110" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="table_chat" value="chat_message"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#B3E5FC;strokeColor=#0277BD;shadow=1;fontSize=11;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="880" y="85" width="110" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- YOLOv8n 模型 -->
+        <mxCell id="yolo_model" value="YOLOv8n 模型&#xa;yolov8n.pt"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#0277BD;shadow=1;fontSize=13;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="215" y="125" width="170" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Python 脚本 -->
+        <mxCell id="python_script" value="Python 检测脚本&#xa;yolo_detect.py"
+                style="shape=mxgraph.bootstrap.rect;rounded=1;fillColor=#FFFFFF;strokeColor=#0277BD;shadow=1;fontSize=13;fontColor=#01579B;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;"
+                vertex="1" parent="lane_storage">
+          <mxGeometry x="435" y="125" width="170" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 连接箭头 ==================== -->
+
+        <!-- 表现层 → 接口层 -->
+        <mxCell id="edge_presentation_api" value="Axios HTTP + WebSocket"
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;strokeWidth=2;fontSize=12;fontColor=#1565C0;endArrow=classic;exitX=0.5;exitY=1;entryX=0.3;entryY=0;"
+                edge="1" parent="1" source="react_app" target="rest_api">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 接口层 → 业务层 -->
+        <mxCell id="edge_api_service" value="服务调用"
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=2;fontSize=12;fontColor=#2E7D32;endArrow=classic;exitX=0.5;exitY=1;entryX=0.35;entryY=0;"
+                edge="1" parent="1" source="rest_api" target="svc_auth">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_api_service2" value=""
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=2;endArrow=classic;exitX=0.5;exitY=1;entryX=0.5;entryY=0;"
+                edge="1" parent="1" source="websocket" target="svc_user">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 业务层 → 数据层 -->
+        <mxCell id="edge_service_data" value="Repository 注入"
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#BF360C;strokeWidth=2;fontSize=12;fontColor=#BF360C;endArrow=classic;exitX=0.5;exitY=1;entryX=0.3;entryY=0;"
+                edge="1" parent="1" source="svc_user" target="repo_user">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_service_data2" value=""
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#BF360C;strokeWidth=2;endArrow=classic;exitX=0.5;exitY=1;entryX=0.5;entryY=0;"
+                edge="1" parent="1" source="svc_visit" target="repo_visit_history">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_service_data3" value=""
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#BF360C;strokeWidth=2;endArrow=classic;exitX=0.5;exitY=1;entryX=0.7;entryY=0;"
+                edge="1" parent="1" source="svc_eyecare" target="repo_eyecare">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 数据层 → 存储层 -->
+        <mxCell id="edge_data_storage" value="JPA 持久化"
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=2;fontSize=12;fontColor=#4A148C;endArrow=classic;exitX=0.3;exitY=1;entryX=0.15;entryY=0;"
+                edge="1" parent="1" source="repo_user" target="mysql">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_data_storage2" value=""
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=2;endArrow=classic;exitX=0.7;exitY=1;entryX=0.35;entryY=0;"
+                edge="1" parent="1" source="jpa" target="h2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_data_storage3" value=""
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=2;endArrow=classic;exitX=0.5;exitY=1;entryX=0.55;entryY=0;"
+                edge="1" parent="1" source="repo_visit_reg" target="mysql">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- YOLO 服务 → AI 模块 -->
+        <mxCell id="edge_yolo" value="subprocess 调用&#xa;Python 脚本"
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E65100;strokeWidth=2;fontSize=12;fontColor=#E65100;endArrow=classic;exitX=0.8;exitY=1;dashed=1;dashPattern=5 5;"
+                edge="1" parent="1" source="svc_yolo" target="python_script">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1100" y="575"/>
+              <mxPoint x="1100" y="720"/>
+              <mxPoint x="520" y="720"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- YOLO 脚本 → 模型 -->
+        <mxCell id="edge_yolo_model" value="加载模型"
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E65100;strokeWidth=2;fontSize=11;fontColor=#E65100;endArrow=classic;exitX=0;exitY=0.5;entryX=1;entryY=0.5;"
+                edge="1" parent="1" source="python_script" target="yolo_model">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== 底部标注 ==================== -->
+        <mxCell id="footer_note" value="技术栈：Spring Boot 4.0.3 · Java 17 · React 19 · Vite · MySQL / H2 · YOLOv8n · WebSocket · Ant Design"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#90A4AE;fontStyle=2;"
+                vertex="1" parent="1">
+          <mxGeometry x="200" y="1065" width="800" height="30" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

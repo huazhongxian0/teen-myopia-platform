@@ -50,6 +50,16 @@ const resolveJavaHome17 = () => {
   return { javaHome: null, pathSeparator };
 };
 
+function readJavaVersion(javaHome) {
+  if (!javaHome) return null;
+  const javaBin = path.join(javaHome, 'bin', process.platform === 'win32' ? 'java.exe' : 'java');
+  if (!fs.existsSync(javaBin)) return null;
+  const result = spawnSync(javaBin, ['-version'], { encoding: 'utf8' });
+  const output = `${result.stdout || ''}\n${result.stderr || ''}`;
+  const firstLine = output.split('\n').map((line) => line.trim()).find(Boolean);
+  return firstLine || null;
+}
+
 const mysqlArgs = ['-h', mysqlHost, '-P', String(mysqlPort), '-u', mysqlUser];
 if (mysqlPassword) {
   mysqlArgs.push(`-p${mysqlPassword}`);
@@ -369,7 +379,114 @@ CREATE TABLE IF NOT EXISTS \`${classTableName}\` (
     buildInsertSql('visit_registration', ['id', 'doctor_account_id', 'patient_account_id', 'visit_date', 'created_at'], visitRegistrationRows),
     buildInsertSql('visit_history', ['id', 'registration_id', 'doctor_account_id', 'patient_account_id', 'visit_date', 'od', 'os', 'created_at'], visitHistoryRows),
     buildInsertSql('eye_care_tip', ['id', 'title', 'content', 'created_at'], extraTips),
+    buildRiskWarningSeedSql(),
   ].filter(Boolean).join('\n');
+}
+
+function buildRiskWarningSeedSql() {
+  const now = Date.now();
+  const day = DAY_MS;
+
+  const baseDoctorId = 2;
+  const baseTeacherId = 3;
+  const baseStudentId = 4;
+  const extraStudentA = 35;
+  const extraStudentB = 36;
+
+  const warningRows = [
+    {
+      id: 1,
+      student_account_id: baseStudentId,
+      level: '高度预警',
+      trigger_type: '阈值触发',
+      trigger_reason: '单次检测平均度数达到高度预警标准（535.0）',
+      status: '未处置',
+      created_at: now - 5 * day,
+      resolved_at: null,
+      resolver_account_id: null,
+      resolution_note: null,
+    },
+    {
+      id: 2,
+      student_account_id: baseStudentId,
+      level: '中度预警',
+      trigger_type: '趋势触发',
+      trigger_reason: '近两次检测视力下降明显（OD下降20.0，OS下降20.0）',
+      status: '未处置',
+      created_at: now - 20 * day,
+      resolved_at: null,
+      resolver_account_id: null,
+      resolution_note: null,
+    },
+    {
+      id: 3,
+      student_account_id: baseStudentId,
+      level: '轻度预警',
+      trigger_type: '超期触发',
+      trigger_reason: '距离上次复查已超过180天，建议尽快复查',
+      status: '已处置',
+      created_at: now - 30 * day,
+      resolved_at: now - 2 * day,
+      resolver_account_id: baseDoctorId,
+      resolution_note: '已安排复查并配镜',
+    },
+    {
+      id: 4,
+      student_account_id: extraStudentA,
+      level: '中度预警',
+      trigger_type: '阈值触发',
+      trigger_reason: '单次检测平均度数达到中度预警标准（310.0）',
+      status: '未处置',
+      created_at: now - 10 * day,
+      resolved_at: null,
+      resolver_account_id: null,
+      resolution_note: null,
+    },
+    {
+      id: 5,
+      student_account_id: extraStudentB,
+      level: '轻度预警',
+      trigger_type: '超期触发',
+      trigger_reason: '距离上次复查已超过200天，建议尽快复查',
+      status: '未处置',
+      created_at: now - 3 * day,
+      resolved_at: null,
+      resolver_account_id: null,
+      resolution_note: null,
+    },
+  ];
+
+  const messageRows = [
+    { warning_id: 1, receiver_account_id: baseStudentId, receiver_role: 'student', read_status: false, created_at: now - 5 * day },
+    { warning_id: 1, receiver_account_id: baseDoctorId, receiver_role: 'doctor', read_status: false, created_at: now - 5 * day },
+    { warning_id: 1, receiver_account_id: baseTeacherId, receiver_role: 'teacher', read_status: false, created_at: now - 5 * day },
+
+    { warning_id: 2, receiver_account_id: baseStudentId, receiver_role: 'student', read_status: true, created_at: now - 20 * day },
+    { warning_id: 2, receiver_account_id: baseDoctorId, receiver_role: 'doctor', read_status: false, created_at: now - 20 * day },
+    { warning_id: 2, receiver_account_id: baseTeacherId, receiver_role: 'teacher', read_status: true, created_at: now - 20 * day },
+
+    { warning_id: 3, receiver_account_id: baseStudentId, receiver_role: 'student', read_status: true, created_at: now - 30 * day },
+    { warning_id: 3, receiver_account_id: baseDoctorId, receiver_role: 'doctor', read_status: true, created_at: now - 30 * day },
+    { warning_id: 3, receiver_account_id: baseTeacherId, receiver_role: 'teacher', read_status: true, created_at: now - 30 * day },
+
+    { warning_id: 4, receiver_account_id: extraStudentA, receiver_role: 'student', read_status: false, created_at: now - 10 * day },
+    { warning_id: 4, receiver_account_id: baseDoctorId, receiver_role: 'doctor', read_status: false, created_at: now - 10 * day },
+    { warning_id: 4, receiver_account_id: baseTeacherId, receiver_role: 'teacher', read_status: false, created_at: now - 10 * day },
+
+    { warning_id: 5, receiver_account_id: extraStudentB, receiver_role: 'student', read_status: false, created_at: now - 3 * day },
+    { warning_id: 5, receiver_account_id: baseDoctorId, receiver_role: 'doctor', read_status: false, created_at: now - 3 * day },
+    { warning_id: 5, receiver_account_id: baseTeacherId, receiver_role: 'teacher', read_status: false, created_at: now - 3 * day },
+  ];
+
+  return [
+    buildInsertSql('risk_warning', [
+      'id', 'student_account_id', 'level', 'trigger_type', 'trigger_reason',
+      'status', 'created_at', 'resolved_at', 'resolver_account_id', 'resolution_note',
+    ], warningRows),
+    buildInsertSql('risk_warning_message', [
+      'warning_id', 'receiver_account_id', 'receiver_role', 'read_status', 'created_at',
+    ], messageRows),
+  ].join('\n');
 }
 
 function runMysqlScriptFromText(scriptText, onComplete) {
@@ -389,7 +506,9 @@ function runMysqlScriptFromText(scriptText, onComplete) {
 function startServices() {
   console.log('测试数据初始化完成，正在启动后端服务...');
 
+  const isWindows = process.platform === 'win32';
   const { javaHome, pathSeparator } = resolveJavaHome17();
+  const defaultYoloModelPath = path.join(__dirname, '..', 'glassess', 'runs', 'detect', 'glasses-count', 'weights', 'best.pt');
   if (!javaHome) {
     console.error('后端启动失败: 未找到可用的 Java 17+ 运行环境。');
     console.error('请安装并启用 JDK 17+，例如（macOS + Homebrew）：');
@@ -399,11 +518,18 @@ function startServices() {
     process.exit(1);
   }
 
+  const javaVersion = readJavaVersion(javaHome);
+  console.log(`后端将使用 Java 17+ 运行环境: ${javaHome}`);
+  if (javaVersion) {
+    console.log(`已解析到的 Java 版本信息: ${javaVersion}`);
+  }
+
   const defaultDbUrl = `jdbc:mysql://${mysqlHost}:${mysqlPort}/${dbName}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true`;
 
   const serverEnv = {
     ...process.env,
     JAVA_HOME: javaHome,
+    JDK_HOME: javaHome,
     PATH: `${path.join(javaHome, 'bin')}${pathSeparator}${process.env.PATH || ''}`,
     DB_URL: process.env.DB_URL || defaultDbUrl,
     DB_USER: process.env.DB_USER || mysqlUser,
@@ -411,17 +537,21 @@ function startServices() {
     DB_HOST: process.env.DB_HOST || mysqlHost,
     DB_PORT: process.env.DB_PORT || String(mysqlPort),
     DB_NAME: process.env.DB_NAME || dbName,
+    YOLO_MODEL_PATH: process.env.YOLO_MODEL_PATH || defaultYoloModelPath,
   };
 
-  const serverProcess = spawn(process.platform === 'win32' ? 'mvnw.cmd' : './mvnw', ['spring-boot:run'], {
-    cwd: path.join(__dirname, '..', 'server'),
+  const serverCwd = path.join(__dirname, '..', 'server');
+  const serverCommand = isWindows ? 'mvnw.cmd' : './mvnw';
+  const serverProcess = spawn(serverCommand, ['spring-boot:run'], {
+    cwd: serverCwd,
     stdio: 'inherit',
     env: serverEnv,
-    shell: true
+    shell: isWindows
   });
 
   serverProcess.on('spawn', () => {
     console.log('后端服务已启动，正在启动前端项目...');
+    console.log(`后端模型路径: ${serverEnv.YOLO_MODEL_PATH}`);
 
     const feProcess = spawn('npm', ['run', 'dev'], {
       cwd: path.join(__dirname, '..', 'fe'),

@@ -81,6 +81,9 @@ def main():
         total_frames = 0
         total_detections = 0
         class_counts = {}
+        detections = []
+        input_suffix = input_path.suffix.lower()
+        should_collect_boxes = input_suffix not in VIDEO_SUFFIXES
 
         for result in results:
             total_frames += 1
@@ -89,14 +92,35 @@ def main():
                 continue
 
             names = getattr(result, "names", {}) or {}
-            for cls_idx in boxes.cls.tolist():
+            orig_shape = getattr(result, "orig_shape", None) or (0, 0)
+            image_height = int(orig_shape[0]) if len(orig_shape) > 0 else 0
+            image_width = int(orig_shape[1]) if len(orig_shape) > 1 else 0
+            xyxy_list = boxes.xyxy.tolist() if getattr(boxes, "xyxy", None) is not None else []
+            conf_list = boxes.conf.tolist() if getattr(boxes, "conf", None) is not None else []
+            class_list = boxes.cls.tolist()
+
+            for index, cls_idx in enumerate(class_list):
                 class_id = int(cls_idx)
                 class_name = names.get(class_id, str(class_id))
                 class_counts[class_name] = class_counts.get(class_name, 0) + 1
                 total_detections += 1
 
+                if should_collect_boxes and index < len(xyxy_list):
+                    xyxy = xyxy_list[index]
+                    confidence = float(conf_list[index]) if index < len(conf_list) else 0.0
+                    detections.append({
+                        "classId": class_id,
+                        "className": class_name,
+                        "confidence": round(confidence, 4),
+                        "x1": round(float(xyxy[0]), 2),
+                        "y1": round(float(xyxy[1]), 2),
+                        "x2": round(float(xyxy[2]), 2),
+                        "y2": round(float(xyxy[3]), 2),
+                        "imageWidth": image_width,
+                        "imageHeight": image_height
+                    })
+
         annotated_path = find_annotated_file(run_dir, input_path.name)
-        input_suffix = input_path.suffix.lower()
         annotated_video_path = annotated_path if input_suffix in VIDEO_SUFFIXES else None
         annotated_image_path = annotated_path if input_suffix not in VIDEO_SUFFIXES else None
 
@@ -107,7 +131,8 @@ def main():
             "summary": {
                 "totalFrames": total_frames,
                 "totalDetections": total_detections,
-                "classCounts": class_counts
+                "classCounts": class_counts,
+                "detections": detections
             },
             "artifact": {
                 "inputPath": str(input_path),

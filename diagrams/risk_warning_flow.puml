@@ -1,0 +1,66 @@
+@startuml 风险预警判定流程图
+
+skinparam activity {
+  BackgroundColor<<判定>> LightYellow
+  BorderColor<<判定>> DarkOrange
+}
+
+title 风险预警多维度判定流程
+
+start
+:加载学生视力数据（eyessight）;
+:加载历史就诊记录（visit_history）;
+
+partition 阈值规则判定 {
+  :计算左右眼平均度数;
+  if (平均度数 >= 500?) then (是)
+    :生成高度预警;
+    :trigger_type = 阈值触发;
+    stop
+  elseif (平均度数 >= 300?) then (是)
+    :生成中度预警;
+    :trigger_type = 阈值触发;
+    stop
+  elseif (平均度数 >= 150?) then (是)
+    :生成轻度预警;
+    :trigger_type = 阈值触发;
+    stop
+  else (否)
+  endif
+}
+
+partition 趋势规则判定 {
+  if (历史记录 >= 2条?) then (是)
+    :对比近两次检测度数;
+    if (单眼下降 >= 0.2度?) then (是)
+      :生成中度预警;
+      :trigger_type = 趋势触发;
+      stop
+    else (否)
+    endif
+  else (否)
+  endif
+}
+
+partition 超期规则判定 {
+  if (存在历史就诊记录?) then (是)
+    :计算距上次复查天数;
+    if (超过180天?) then (是)
+      :生成轻度预警;
+      :trigger_type = 超期触发;
+      stop
+    else (否)
+    endif
+  else (否)
+    :生成轻度预警;
+    :trigger_type = 超期触发;
+    :原因 = 从未复查;
+    stop
+  endif
+}
+
+:未触发任何预警规则;
+:风险等级 = 正常关注;
+stop
+
+@enduml

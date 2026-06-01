@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class RawWebSocketHandler extends TextWebSocketHandler {
@@ -42,7 +43,7 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         sessionsById.remove(session.getId());
-        realtimeStates.remove(session.getId());
+        closeRealtimeState(session.getId());
     }
 
     public void broadcastTestCommand() {
@@ -112,6 +113,13 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
 
     private void handleRealtimeStart(WebSocketSession session, JsonNode node) {
         try {
+            // #region debug-point model-path-missing-6
+            log.info("[DEBUG][realtime-start] 收到启动请求 sessionId={} classId={} className={} tokenExists={}",
+                    session.getId(),
+                    node.path("classId").isMissingNode() || node.path("classId").isNull() ? null : node.path("classId").asLong(),
+                    textOrNull(node.path("className")),
+                    textOrNull(node.path("token")) != null);
+            // #endregion
             AuthService.AuthResult auth = verifyLogin(node);
             Long classId = node.path("classId").isMissingNode() || node.path("classId").isNull() ? null : node.path("classId").asLong();
             String className = textOrNull(node.path("className"));
@@ -120,7 +128,23 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
                     node.path("iou").isMissingNode() ? null : node.path("iou").asDouble(),
                     node.path("imgsz").isMissingNode() ? null : node.path("imgsz").asInt()
             );
-            realtimeStates.put(session.getId(), new RealtimeSessionState(auth.accountId(), classId, className, command));
+            YoloDetectionService.RealtimeWorkerSession workerSession = yoloDetectionService.openRealtimeWorker(command);
+            closeRealtimeState(session.getId());
+            RealtimeSessionState nextState = new RealtimeSessionState(new RealtimeFrameProcessor(
+                    workerSession,
+                    (result) -> sendRealtimeUpdate(session, classId, className, result),
+                    (error) -> {
+                        log.error("[DEBUG][realtime-stream] sessionId={} message={}", session.getId(), error.getMessage(), error);
+                        sendError(session, error.getMessage() == null ? "实时检测失败" : error.getMessage());
+                    }
+            ));
+            realtimeStates.put(session.getId(), nextState);
+            // #region debug-point model-path-missing-7
+            log.info("[DEBUG][realtime-start] 启动成功 sessionId={} accountId={} realtimeStateSize={}",
+                    session.getId(),
+                    auth.accountId(),
+                    realtimeStates.size());
+            // #endregion
 
             ObjectNode props = objectMapper.createObjectNode();
             if (classId != null) {
@@ -134,12 +158,18 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
             props.put("detectedAt", System.currentTimeMillis());
             sendKey(session, "yolo:realtime:status", props);
         } catch (IllegalArgumentException e) {
+            // #region debug-point model-path-missing-8
+            log.warn("[DEBUG][realtime-start] 启动失败 sessionId={} message={}", session.getId(), e.getMessage());
+            // #endregion
             sendError(session, e.getMessage());
+        } catch (Exception e) {
+            log.error("[DEBUG][realtime-start] 启动异常 sessionId={}", session.getId(), e);
+            sendError(session, e.getMessage() == null ? "实时检测启动失败" : e.getMessage());
         }
     }
 
     private void handleRealtimeStop(WebSocketSession session, JsonNode node) {
-        realtimeStates.remove(session.getId());
+        closeRealtimeState(session.getId());
         ObjectNode props = objectMapper.createObjectNode();
         if (!node.path("classId").isMissingNode() && !node.path("classId").isNull()) {
             props.put("classId", node.path("classId").asLong());
@@ -159,47 +189,12 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
             sendError(session, "实时检测尚未启动");
             return;
         }
-        if (!state.processing().compareAndSet(false, true)) {
-            log.warn("[DEBUG] 帧被丢弃: 上一帧还在处理中 sessionId={}", session.getId());
+        String frameDataUrl = textOrNull(node.path("frameDataUrl"));
+        if (frameDataUrl == null) {
+            sendError(session, "缺少图像帧数据");
             return;
         }
-
-        log.info("[DEBUG] 帧处理开始 sessionId={} classId={}", session.getId(), state.classId());
-        
-        CompletableFuture.runAsync(() -> {
-            try {
-                verifyLogin(node);
-                String frameDataUrl = textOrNull(node.path("frameDataUrl"));
-                if (frameDataUrl == null) {
-                    throw new IllegalArgumentException("缺少图像帧数据");
-                }
-
-                log.info("[DEBUG] 即将调用 detectFrameDataUrl... frameDataUrl长度={}", frameDataUrl.length());
-                YoloDetectionService.RealtimeDetectResult result = yoloDetectionService.detectFrameDataUrl(frameDataUrl, state.command());
-                log.info("[DEBUG] detectFrameDataUrl 返回成功 requestId={} count={}", result.requestId(), result.count());
-                ObjectNode props = objectMapper.createObjectNode();
-                if (state.classId() != null) {
-                    props.put("classId", state.classId());
-                }
-                if (state.className() != null) {
-                    props.put("className", state.className());
-                }
-                props.put("requestId", result.requestId());
-                props.put("count", result.count());
-                props.put("totalDetections", result.totalDetections());
-                props.put("detectedAt", result.detectedAt());
-                props.set("classCounts", toObjectNode(result.classCounts()));
-                sendKey(session, "yolo:realtime:update", props);
-            } catch (IllegalArgumentException e) {
-                log.error("[DEBUG] 帧处理 IllegalArgumentException: {}", e.getMessage());
-                sendError(session, e.getMessage());
-            } catch (Exception e) {
-                log.error("[DEBUG] 帧处理异常: ", e);
-                sendError(session, "实时检测失败");
-            } finally {
-                state.processing().set(false);
-            }
-        });
+        state.processor().submit(frameDataUrl);
     }
 
     private AuthService.AuthResult verifyLogin(JsonNode node) {
@@ -211,6 +206,9 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendError(WebSocketSession session, String message) {
+        // #region debug-point model-path-missing-9
+        log.warn("[DEBUG][ws-error] sessionId={} message={}", session != null ? session.getId() : null, message);
+        // #endregion
         ObjectNode props = objectMapper.createObjectNode();
         props.put("message", message == null ? "实时检测失败" : message);
         props.put("detectedAt", System.currentTimeMillis());
@@ -228,7 +226,36 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage(payload.toString()));
         } catch (Exception ignored) {
             sessionsById.remove(session.getId());
-            realtimeStates.remove(session.getId());
+            closeRealtimeState(session.getId());
+        }
+    }
+
+    private void sendRealtimeUpdate(
+            WebSocketSession session,
+            Long classId,
+            String className,
+            YoloDetectionService.RealtimeDetectResult result
+    ) {
+        ObjectNode props = objectMapper.createObjectNode();
+        if (classId != null) {
+            props.put("classId", classId);
+        }
+        if (className != null) {
+            props.put("className", className);
+        }
+        props.put("requestId", result.requestId());
+        props.put("count", result.count());
+        props.put("totalDetections", result.totalDetections());
+        props.put("detectedAt", result.detectedAt());
+        props.set("classCounts", toObjectNode(result.classCounts()));
+        props.set("detections", objectMapper.valueToTree(result.detections()));
+        sendKey(session, "yolo:realtime:update", props);
+    }
+
+    private void closeRealtimeState(String sessionId) {
+        RealtimeSessionState removed = realtimeStates.remove(sessionId);
+        if (removed != null) {
+            removed.close();
         }
     }
 
@@ -258,15 +285,88 @@ public class RawWebSocketHandler extends TextWebSocketHandler {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    private record RealtimeSessionState(
-            Long accountId,
-            Long classId,
-            String className,
-            YoloDetectionService.DetectVideoCommand command,
-            AtomicBoolean processing
-    ) {
-        private RealtimeSessionState(Long accountId, Long classId, String className, YoloDetectionService.DetectVideoCommand command) {
-            this(accountId, classId, className, command, new AtomicBoolean(false));
+    private static final class RealtimeSessionState implements AutoCloseable {
+        private final RealtimeFrameProcessor processor;
+
+        private RealtimeSessionState(RealtimeFrameProcessor processor) {
+            this.processor = processor;
+        }
+
+        public RealtimeFrameProcessor processor() {
+            return processor;
+        }
+
+        @Override
+        public void close() {
+            processor.close();
+        }
+    }
+
+    private static final class RealtimeFrameProcessor implements AutoCloseable {
+        private final YoloDetectionService.RealtimeWorkerSession workerSession;
+        private final java.util.function.Consumer<YoloDetectionService.RealtimeDetectResult> onResult;
+        private final java.util.function.Consumer<Exception> onError;
+        private final AtomicReference<String> latestFrameDataUrlRef = new AtomicReference<>();
+        private final AtomicBoolean draining = new AtomicBoolean(false);
+        private final AtomicBoolean closed = new AtomicBoolean(false);
+
+        private RealtimeFrameProcessor(
+                YoloDetectionService.RealtimeWorkerSession workerSession,
+                java.util.function.Consumer<YoloDetectionService.RealtimeDetectResult> onResult,
+                java.util.function.Consumer<Exception> onError
+        ) {
+            this.workerSession = workerSession;
+            this.onResult = onResult;
+            this.onError = onError;
+        }
+
+        public void submit(String frameDataUrl) {
+            if (closed.get()) {
+                return;
+            }
+            latestFrameDataUrlRef.set(frameDataUrl);
+            drainAsync();
+        }
+
+        private void drainAsync() {
+            if (!draining.compareAndSet(false, true)) {
+                return;
+            }
+            CompletableFuture.runAsync(() -> {
+                try {
+                    while (!closed.get()) {
+                        String frameDataUrl = latestFrameDataUrlRef.getAndSet(null);
+                        if (frameDataUrl == null) {
+                            return;
+                        }
+                        try {
+                            YoloDetectionService.RealtimeDetectResult result = workerSession.detectFrameDataUrl(frameDataUrl);
+                            if (!closed.get()) {
+                                onResult.accept(result);
+                            }
+                        } catch (Exception e) {
+                            if (!closed.get()) {
+                                onError.accept(e instanceof Exception ? e : new IllegalStateException("实时检测失败"));
+                            }
+                            return;
+                        }
+                    }
+                } finally {
+                    draining.set(false);
+                    if (!closed.get() && latestFrameDataUrlRef.get() != null) {
+                        drainAsync();
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void close() {
+            if (!closed.compareAndSet(false, true)) {
+                return;
+            }
+            latestFrameDataUrlRef.set(null);
+            workerSession.close();
         }
     }
 }

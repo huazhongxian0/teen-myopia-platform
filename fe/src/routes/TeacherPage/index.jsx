@@ -1,6 +1,7 @@
 import { Col, Row, Space, Typography, Card, Tabs, Button, Empty, Spin, message, Select, Input } from 'antd'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BarChartOutlined, BellOutlined, FileTextOutlined, TeamOutlined } from '@ant-design/icons'
+import { BarChartOutlined, BellOutlined, FileTextOutlined, TeamOutlined, WarningOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import { useAccount } from '../../hooks/useAccount.js'
 import { httpClient } from '../../services/http/index.js'
 import LogoutButton from '../../components/LogoutButton.jsx'
@@ -17,6 +18,7 @@ export default function TeacherPage({ onLogout }) {
   const { account } = useAccount()
   const displayName = account?.name ?? account?.accountName ?? '-'
   const roleId = account?.roleId ?? '-'
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
   const [classes, setClasses] = useState([])
   const [loading, setLoading] = useState(false)
@@ -352,6 +354,27 @@ export default function TeacherPage({ onLogout }) {
                                 <Text strong className="actionTitle">视力统计</Text>
                                 <Text type="secondary" className="actionDesc">
                                   查看班级学生视力统计数据
+                                </Text>
+                              </div>
+                              <div className="actionArrow">→</div>
+                            </div>
+                          </Card>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                          <Card
+                            className="actionCard"
+                            hoverable
+                            variant="borderless"
+                            onClick={() => navigate('/teacher/riskWarning')}
+                          >
+                            <div className="actionCardInner">
+                              <div className="actionIconBox actionIconBox-orange">
+                                <WarningOutlined className="actionIcon" />
+                              </div>
+                              <div className="actionContent">
+                                <Text strong className="actionTitle">班级风险预警</Text>
+                                <Text type="secondary" className="actionDesc">
+                                  查看班级视力风险预警与批量评估
                                 </Text>
                               </div>
                               <div className="actionArrow">→</div>

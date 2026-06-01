@@ -1,13 +1,14 @@
 import { Col, Row, Space, Typography, Card, Button, Avatar, message, Tabs, Drawer, DatePicker, Select, Table, Tag } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
-import { 
-  LogoutOutlined, 
-  BarChartOutlined, 
-  CalendarOutlined, 
-  LineChartOutlined, 
-  FileTextOutlined, 
-  MedicineBoxOutlined, 
-  UserOutlined 
+import {
+  LogoutOutlined,
+  BarChartOutlined,
+  CalendarOutlined,
+  LineChartOutlined,
+  FileTextOutlined,
+  MedicineBoxOutlined,
+  UserOutlined,
+  WarningOutlined
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAccount } from '../../hooks/useAccount.js'
@@ -306,6 +307,22 @@ export default function StudentPage({ onLogout }) {
                             <Text strong className="actionTitle">预约视力检查</Text>
                             <Text type="secondary" className="actionDesc">
                               选择医生与日期，提交预约
+                            </Text>
+                          </div>
+                          <div className="actionArrow">→</div>
+                        </div>
+                      </Card>
+                    </Col>
+                    <Col xs={24} sm={12}>
+                      <Card className="actionCard" hoverable bordered={false} onClick={() => navigate('/student/riskWarning')}>
+                        <div className="actionCardInner">
+                          <div className="actionIconBox actionIconBox-orange">
+                            <WarningOutlined className="actionIcon" />
+                          </div>
+                          <div className="actionContent">
+                            <Text strong className="actionTitle">风险预警</Text>
+                            <Text type="secondary" className="actionDesc">
+                              查看我的视力风险预警与消息通知
                             </Text>
                           </div>
                           <div className="actionArrow">→</div>

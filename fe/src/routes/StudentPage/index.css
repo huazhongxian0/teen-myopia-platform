@@ -402,6 +402,11 @@
   color: #5b3df5;
 }
 
+.actionIconBox-orange {
+  background: rgba(255, 138, 61, 0.12);
+  color: #ff8a3d;
+}
+
 .actionCard:hover .actionIconBox {
   transform: scale(1.05);
 }

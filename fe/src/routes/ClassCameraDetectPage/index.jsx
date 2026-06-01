@@ -11,6 +11,12 @@ const { Title, Text } = Typography
 
 const wsPath = config?.endpoints?.wsNative ?? '/ws-raw'
 const defaultWsUrl = `${config.server.wsProtocol}://${config.server.domain}:${config.server.port}${wsPath}`
+const realtimeStartWaitMs = 80
+const realtimeNextFrameDelayMs = 120
+const realtimeRecoverFrameDelayMs = 180
+const realtimeRetryFrameDelayMs = 220
+const realtimeCaptureMaxWidth = 640
+const realtimeHistoryThrottleMs = 800
 
 function safeJsonParse(text) {
   try {
@@ -79,6 +85,47 @@ function pickPrimaryCount(classCounts, totalDetections) {
   return Math.max(Number(totalDetections) || 0, 0)
 }
 
+function normalizeDetections(detections) {
+  if (!Array.isArray(detections)) return []
+  return detections
+    .map((item) => ({
+      className: String(item?.className ?? ''),
+      confidence: Number(item?.confidence) || 0,
+      x1: Number(item?.x1) || 0,
+      y1: Number(item?.y1) || 0,
+      x2: Number(item?.x2) || 0,
+      y2: Number(item?.y2) || 0,
+      imageWidth: Number(item?.imageWidth) || 0,
+      imageHeight: Number(item?.imageHeight) || 0,
+    }))
+    .filter((item) => item.imageWidth > 0 && item.imageHeight > 0 && item.x2 > item.x1 && item.y2 > item.y1)
+}
+
+function mapDetectionToViewport(detection, viewportSize) {
+  const viewportWidth = Number(viewportSize?.width) || 0
+  const viewportHeight = Number(viewportSize?.height) || 0
+  if (!viewportWidth || !viewportHeight) return null
+
+  const sourceWidth = detection.imageWidth
+  const sourceHeight = detection.imageHeight
+  if (!sourceWidth || !sourceHeight) return null
+
+  const scale = Math.max(viewportWidth / sourceWidth, viewportHeight / sourceHeight)
+  const renderWidth = sourceWidth * scale
+  const renderHeight = sourceHeight * scale
+  const offsetX = (viewportWidth - renderWidth) / 2
+  const offsetY = (viewportHeight - renderHeight) / 2
+
+  return {
+    left: offsetX + detection.x1 * scale,
+    top: offsetY + detection.y1 * scale,
+    width: (detection.x2 - detection.x1) * scale,
+    height: (detection.y2 - detection.y1) * scale,
+    className: detection.className,
+    confidence: detection.confidence,
+  }
+}
+
 function normalizeRealtimePayload(props) {
   const totalDetections = typeof props?.totalDetections === 'number' ? props.totalDetections : 0
   const classCounts = props?.classCounts && typeof props.classCounts === 'object' ? props.classCounts : {}
@@ -86,6 +133,7 @@ function normalizeRealtimePayload(props) {
     count: typeof props?.count === 'number' ? props.count : pickPrimaryCount(classCounts, totalDetections),
     totalDetections,
     classCounts,
+    detections: normalizeDetections(props?.detections),
     detectedAt: typeof props?.detectedAt === 'number' ? props.detectedAt : Date.now(),
   }
 }
@@ -101,7 +149,14 @@ function normalizeUploadResponse(data) {
     classCounts,
     detectedAt: Date.now(),
     status: data?.status || '-',
+    detections: normalizeDetections(summary?.detections),
   }
+}
+
+function formatClassCounts(classCounts) {
+  const entries = Object.entries(classCounts ?? {})
+  if (entries.length === 0) return '暂无类别结果'
+  return entries.map(([key, value]) => `${key} ${value}`).join(' / ')
 }
 
 function humanizeDetectionError(text) {
@@ -130,21 +185,31 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
   const [count, setCount] = useState(null)
   const [totalDetections, setTotalDetections] = useState(0)
   const [classCounts, setClassCounts] = useState({})
+  const [detections, setDetections] = useState([])
   const [detectedAt, setDetectedAt] = useState(null)
   const [errorText, setErrorText] = useState('')
   const [history, setHistory] = useState([])
   const [wsStatus, setWsStatus] = useState('未连接')
   const [cameraReady, setCameraReady] = useState(false)
   const [manualFile, setManualFile] = useState(null)
+  const [manualPreviewUrl, setManualPreviewUrl] = useState('')
   const [uploadResult, setUploadResult] = useState(null)
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
+  const [uploadViewportSize, setUploadViewportSize] = useState({ width: 0, height: 0 })
 
   const tickRef = useRef(null)
   const wsClientRef = useRef(null)
   const videoRef = useRef(null)
-  const canvasRef = useRef(null)
+  const viewportRef = useRef(null)
+  const uploadViewportRef = useRef(null)
   const streamRef = useRef(null)
   const fileInputRef = useRef(null)
   const runningRef = useRef(false)
+  const frameInFlightRef = useRef(false)
+  const sessionReadyRef = useRef(false)
+  const lastHistoryAtRef = useRef(0)
+  const captureCanvasRef = useRef(null)
+  const captureContextRef = useRef(null)
 
   const classCountsText = useMemo(() => {
     const entries = Object.entries(classCounts ?? {})
@@ -160,9 +225,102 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
     return { color: 'default', text: '未启动' }
   }, [cameraReady, classId, errorText, running])
 
+  const overlayDetections = useMemo(() => {
+    return detections
+      .filter((item) => isPositiveGlassesKey(normalizeClassKey(item.className)))
+      .map((item) => mapDetectionToViewport(item, viewportSize))
+      .filter(Boolean)
+  }, [detections, viewportSize])
+
+  const uploadOverlayDetections = useMemo(() => {
+    return (uploadResult?.detections ?? [])
+      .filter((item) => isPositiveGlassesKey(normalizeClassKey(item.className)))
+      .map((item) => mapDetectionToViewport(item, uploadViewportSize))
+      .filter(Boolean)
+  }, [uploadResult, uploadViewportSize])
+
   useEffect(() => {
     runningRef.current = running
   }, [running])
+
+  useEffect(() => {
+    if (!cameraReady) return
+    if (!streamRef.current) return
+    if (!videoRef.current) return
+    if (videoRef.current.srcObject !== streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+    }
+    void videoRef.current.play().catch(() => null)
+  }, [cameraReady])
+
+  function clearLoopTimer() {
+    if (tickRef.current) {
+      window.clearTimeout(tickRef.current)
+      tickRef.current = null
+    }
+  }
+
+  function releaseFrameInFlight() {
+    frameInFlightRef.current = false
+  }
+
+  function scheduleNextFrame(delay = realtimeNextFrameDelayMs) {
+    if (!runningRef.current) return
+    clearLoopTimer()
+    tickRef.current = window.setTimeout(() => {
+      void captureAndSendFrame({ silent: true, fromLoop: true })
+    }, delay)
+  }
+
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return undefined
+
+    const updateViewportSize = () => {
+      setViewportSize({
+        width: viewport.clientWidth || 0,
+        height: viewport.clientHeight || 0,
+      })
+    }
+
+    updateViewportSize()
+    const observer = new ResizeObserver(() => {
+      updateViewportSize()
+    })
+    observer.observe(viewport)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const viewport = uploadViewportRef.current
+    if (!viewport) return undefined
+
+    const updateViewportSize = () => {
+      setUploadViewportSize({
+        width: viewport.clientWidth || 0,
+        height: viewport.clientHeight || 0,
+      })
+    }
+
+    updateViewportSize()
+    const observer = new ResizeObserver(() => {
+      updateViewportSize()
+    })
+    observer.observe(viewport)
+    return () => observer.disconnect()
+  }, [manualPreviewUrl, uploadResult])
+
+  useEffect(() => {
+    if (!manualFile) {
+      setManualPreviewUrl('')
+      return undefined
+    }
+    const objectUrl = URL.createObjectURL(manualFile)
+    setManualPreviewUrl(objectUrl)
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [manualFile])
 
   useEffect(() => {
     const client = new WebSocketClient({
@@ -179,6 +337,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
 
     const offOpen = client.on('open', () => {
       setWsStatus('已连接')
+      sessionReadyRef.current = false
       if (runningRef.current && classId && token) {
         client.sendJson({
           type: 'yolo.realtime.start',
@@ -193,9 +352,12 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
     })
     const offClose = client.on('close', () => {
       setWsStatus('已断开')
+      sessionReadyRef.current = false
+      releaseFrameInFlight()
     })
     const offReconnect = client.on('reconnect', ({ retries }) => {
       setWsStatus(`重连中(${retries})`)
+      sessionReadyRef.current = false
     })
     const offError = client.on('error', () => {
       setWsStatus('连接异常')
@@ -207,11 +369,14 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
       const props = payload?.props ?? {}
       if (key === 'yolo:realtime:update') {
         const normalized = normalizeRealtimePayload(props)
+        sessionReadyRef.current = true
         setErrorText('')
         setCount(normalized.count)
         setTotalDetections(normalized.totalDetections)
         setClassCounts(normalized.classCounts)
+        setDetections(normalized.detections)
         setDetectedAt(normalized.detectedAt)
+        setWsStatus('实时检测中')
         publishOverviewRealtimeSnapshot({
           classId,
           className,
@@ -222,16 +387,24 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
           running: true,
           source: '实时检测',
         })
-        setHistory((prev) => [{ at: normalized.detectedAt, count: normalized.count, source: '实时检测' }, ...prev].slice(0, 10))
+        pushHistoryThrottled(normalized.count, normalized.detectedAt, '实时检测')
         return
       }
       if (key === 'yolo:realtime:error') {
         const text = humanizeDetectionError(props?.message || '实时检测失败')
         setErrorText(text)
+        if (runningRef.current) {
+          setWsStatus('等待恢复')
+          scheduleNextFrame(realtimeRecoverFrameDelayMs)
+        }
         return
       }
       if (key === 'yolo:realtime:status') {
+        sessionReadyRef.current = Boolean(props?.running)
         setWsStatus(props?.running ? '实时检测中' : '已连接')
+        if (props?.running && runningRef.current && !tickRef.current) {
+          scheduleNextFrame(realtimeNextFrameDelayMs)
+        }
       }
     })
 
@@ -264,7 +437,16 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
   }
 
   async function ensureCameraReady() {
-    if (streamRef.current && cameraReady) return true
+    if (streamRef.current) {
+      if (videoRef.current && videoRef.current.srcObject !== streamRef.current) {
+        videoRef.current.srcObject = streamRef.current
+        await videoRef.current.play().catch(() => null)
+      }
+      if (!cameraReady) {
+        setCameraReady(true)
+      }
+      return true
+    }
     if (!navigator?.mediaDevices?.getUserMedia) {
       throw new Error('当前浏览器不支持摄像头能力')
     }
@@ -292,16 +474,8 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
   }
 
   function ensureRealtimeSessionActive(client) {
-    console.log('[前端DEBUG] ensureRealtimeSessionActive 开始检查', { isOpen: client?.isOpen, running: runningRef.current })
-    if (!client?.isOpen) {
-      console.log('[前端DEBUG] ❌ 客户端未打开')
-      return false
-    }
-    if (runningRef.current) {
-      console.log('[前端DEBUG] ✅ 已在运行中，跳过 start')
-      return true
-    }
-    console.log('[前端DEBUG] 📤 发送 yolo.realtime.start...')
+    if (!client?.isOpen) return false
+    if (sessionReadyRef.current && runningRef.current) return true
     client.sendJson({
       type: 'yolo.realtime.start',
       token,
@@ -311,7 +485,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
       iou: 0.45,
       imgsz: 640,
     })
-    console.log('[前端DEBUG] ✅ start 已发送')
+    sessionReadyRef.current = true
     return true
   }
 
@@ -319,116 +493,114 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
     setHistory((prev) => [{ at: nextAt, count: nextCount, source }, ...prev].slice(0, 10))
   }
 
-  async function captureAndSendFrame({ silent = false } = {}) {
-    console.log('[前端DEBUG] ===== captureAndSendFrame 开始 =====')
+  function pushHistoryThrottled(nextCount, nextAt, source) {
+    const now = Date.now()
+    if (now - lastHistoryAtRef.current < realtimeHistoryThrottleMs) {
+      return
+    }
+    lastHistoryAtRef.current = now
+    pushHistory(nextCount, nextAt, source)
+  }
+
+  function getCaptureCanvasContext(width, height) {
+    if (!captureCanvasRef.current) {
+      captureCanvasRef.current = document.createElement('canvas')
+    }
+    const canvas = captureCanvasRef.current
+    if (canvas.width !== width) {
+      canvas.width = width
+    }
+    if (canvas.height !== height) {
+      canvas.height = height
+    }
+    if (!captureContextRef.current) {
+      captureContextRef.current = canvas.getContext('2d', {
+        alpha: false,
+        desynchronized: true,
+      })
+    }
+    return {
+      canvas,
+      ctx: captureContextRef.current,
+    }
+  }
+
+  async function captureAndSendFrame({ silent = false, fromLoop = false } = {}) {
     if (!classId) {
-      console.log('[前端DEBUG] ❌ 没有 classId，退出')
+      return
+    }
+    if (frameInFlightRef.current) {
+      if (!silent && !fromLoop) {
+        message.info('当前画面正在发送中，请稍候')
+      }
+      if (fromLoop && runningRef.current) {
+        scheduleNextFrame(realtimeNextFrameDelayMs)
+      }
       return
     }
     if (!token) {
       const text = '当前登录态无效，请重新登录'
-      console.log('[前端DEBUG] ❌ 没有 token')
       setErrorText(text)
       if (!silent) message.error(text)
       return
     }
+    frameInFlightRef.current = true
+    let nextLoopDelay = realtimeNextFrameDelayMs
     try {
-      console.log('[前端DEBUG] 📷 准备获取摄像头...')
       await ensureCameraReady()
-      console.log('[前端DEBUG] ✅ 摄像头就绪')
-      
-      console.log('[前端DEBUG] 🔌 准备连接 WebSocket...')
       const client = await ensureWsConnected()
-      console.log('[前端DEBUG] ✅ WebSocket 已连接', { isOpen: client.isOpen })
-      
-      console.log('[前端DEBUG] 🎯 确保实时会话活跃...')
       if (!ensureRealtimeSessionActive(client)) {
         const text = '实时连接不可用'
-        console.log('[前端DEBUG] ❌ 实时会话激活失败')
         setErrorText(text)
         if (!silent) message.error(text)
         return
       }
 
-      console.log('[前端DEBUG] ⏳ 等待 300ms 让后端处理 start...')
-      await new Promise(resolve => setTimeout(resolve, 300))
+      if (!runningRef.current || !sessionReadyRef.current) {
+        await new Promise((resolve) => setTimeout(resolve, realtimeStartWaitMs))
+      }
 
-      console.log('[前端DEBUG] 🔁 二次检查连接状态...')
-      const client2 = await ensureWsConnected()
-      if (!client2?.isOpen) {
+      const activeClient = await ensureWsConnected()
+      if (!activeClient?.isOpen) {
         const text = 'WebSocket 连接已断开'
-        console.log('[前端DEBUG] ❌ 二次检查发现连接断开')
         setErrorText(text)
         if (!silent) message.error(text)
         return
       }
-      console.log('[前端DEBUG] ✅ 二次检查通过，连接正常')
-      
+
       const video = videoRef.current
-      const canvas = canvasRef.current
-      if (!video || !canvas) {
-        console.log('[前端DEBUG] ❌ video 或 canvas 不存在')
+      if (!video) {
         return
       }
-      const width = video.videoWidth || 960
-      const height = video.videoHeight || 540
-      canvas.width = width
-      canvas.height = height
-      const ctx = canvas.getContext('2d')
+      const sourceWidth = video.videoWidth || 960
+      const sourceHeight = video.videoHeight || 540
+      const scale = sourceWidth > realtimeCaptureMaxWidth ? realtimeCaptureMaxWidth / sourceWidth : 1
+      const width = Math.max(Math.round(sourceWidth * scale), 1)
+      const height = Math.max(Math.round(sourceHeight * scale), 1)
+      const { canvas, ctx } = getCaptureCanvasContext(width, height)
       if (!ctx) {
-        console.log('[前端DEBUG] ❌ 无法获取 2d context')
         return
       }
       ctx.drawImage(video, 0, 0, width, height)
       const frameDataUrl = canvas.toDataURL('image/jpeg', 0.4)
-      console.log('[前端DEBUG] 📸 帧已捕获，大小:', frameDataUrl.length)
 
-      const frameMessage = {
+      activeClient.sendJson({
         type: 'yolo.realtime.frame',
         token,
         classId,
         className,
         frameDataUrl,
-      }
-      const frameJsonStr = JSON.stringify(frameMessage)
-      console.log('[前端DEBUG] 📏 帧消息JSON大小:', frameJsonStr.length, '字节')
-      
-      console.log('[前端DEBUG] 🚀 发送 yolo.realtime.frame...')
-      console.log('[前端DEBUG] 🔍 发送前连接状态:', {
-        readyState: client._ws?.readyState,
-        isOpen: client.isOpen,
-        wsExists: !!client._ws,
-        wsUrl: client._ws?.url
       })
-
-      try {
-        client.sendJson(frameMessage)
-        console.log('[前端DEBUG] ✅ sendJson 执行完成')
-
-        await new Promise(resolve => setTimeout(resolve, 200))
-
-        const postSendStatus = {
-          readyState: client._ws?.readyState,
-          isOpen: client.isOpen,
-          wsExists: !!client._ws,
-          bufferedAmount: client._ws?.bufferedAmount ?? 0
-        }
-        console.log('[前端DEBUG] 🔍 发送后200ms连接状态:', postSendStatus)
-
-        if (!postSendStatus.wsExists || postSendStatus.readyState !== 1) {
-          console.warn('[前端DEBUG] ⚠️ WebSocket 在发送后断开! 可能原因: 后端处理帧时关闭了连接')
-        }
-
-        console.log('[前端DEBUG] ✅ frame 已发送')
-      } catch (sendErr) {
-        console.error('[前端DEBUG] ❌ sendJson 抛出异常:', sendErr.message)
-        throw sendErr
-      }
     } catch (e) {
       const text = e?.message || '发送检测帧失败'
-      console.log('[前端DEBUG] ❌ 异常:', text, e)
       setErrorText(text)
       if (!silent) message.error(text)
+      nextLoopDelay = realtimeRetryFrameDelayMs
+    } finally {
+      releaseFrameInFlight()
+      if (fromLoop && runningRef.current) {
+        scheduleNextFrame(nextLoopDelay)
+      }
     }
   }
 
@@ -453,10 +625,10 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
         imgsz: 640,
       })
       setRunning(true)
-      await captureAndSendFrame({ silent: true })
-      tickRef.current = window.setInterval(() => {
-        void captureAndSendFrame({ silent: true })
-      }, 1600)
+      runningRef.current = true
+      sessionReadyRef.current = true
+      releaseFrameInFlight()
+      scheduleNextFrame(realtimeStartWaitMs)
     } catch (e) {
       const text = e?.message || '启动实时检测失败'
       setErrorText(text)
@@ -467,10 +639,10 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
   }
 
   function stopRealtimeDetection() {
-    if (tickRef.current) {
-      window.clearInterval(tickRef.current)
-      tickRef.current = null
-    }
+    clearLoopTimer()
+    releaseFrameInFlight()
+    sessionReadyRef.current = false
+    runningRef.current = false
     setRunning(false)
     const client = wsClientRef.current
     if (client?.isOpen) {
@@ -495,7 +667,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
 
   async function handleUploadDetect() {
     if (!manualFile) {
-      message.warning('请先选择要检测的视频文件')
+      message.warning('请先选择要检测的图片文件')
       return
     }
     try {
@@ -525,10 +697,10 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
         classCounts: normalized.classCounts,
         detectedAt: normalized.detectedAt,
         running: false,
-        source: '上传检测',
+        source: '上传图片检测',
       })
-      pushHistory(normalized.count, normalized.detectedAt, '上传检测')
-      message.success('视频检测完成')
+      pushHistory(normalized.count, normalized.detectedAt, '上传图片检测')
+      message.success('图片检测完成')
     } catch (e) {
       const text = humanizeDetectionError(e?.message || '上传检测失败')
       setErrorText(text)
@@ -540,10 +712,8 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
 
   useEffect(() => {
     return () => {
-      if (tickRef.current) {
-        window.clearInterval(tickRef.current)
-        tickRef.current = null
-      }
+      clearLoopTimer()
+      releaseFrameInFlight()
       stopCameraStream()
     }
   }, [])
@@ -554,15 +724,18 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
     setCount(null)
     setTotalDetections(0)
     setClassCounts({})
+    setDetections([])
     setDetectedAt(null)
     setErrorText('')
     setHistory([])
+    lastHistoryAtRef.current = 0
     setManualFile(null)
+    setManualPreviewUrl('')
     setUploadResult(null)
-    if (tickRef.current) {
-      window.clearInterval(tickRef.current)
-      tickRef.current = null
-    }
+    clearLoopTimer()
+    releaseFrameInFlight()
+    sessionReadyRef.current = false
+    runningRef.current = false
     setRunning(false)
     const client = wsClientRef.current
     if (client?.isOpen) {
@@ -576,7 +749,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
   }, [classId, token])
 
   return (
-    <div className="ccdRoot">
+    <div className={running ? 'ccdRoot ccdRootRunning' : 'ccdRoot'}>
       <div className="ccdGlow ccdGlowA" />
       <div className="ccdGlow ccdGlowB" />
 
@@ -602,7 +775,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
               )}
             </div>
             <Text className="ccdSubtitle">
-              {className} · 基于 glassess 数据集训练模型统计当前画面中戴眼镜同学数量
+              {className}
             </Text>
           </div>
         </div>
@@ -648,24 +821,41 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
               <Text className="ccdVideoMeta">{detectedAt ? `最近更新：${formatTime(detectedAt)}` : '等待首次抓取'}</Text>
             </div>
 
-            <div className="ccdVideoViewport" aria-label="摄像头画面占位">
+            <div ref={viewportRef} className="ccdVideoViewport" aria-label="摄像头画面占位">
               {cameraReady ? (
                 <video ref={videoRef} className="ccdVideoPlayer" muted playsInline autoPlay />
               ) : null}
-              <canvas ref={canvasRef} className="ccdCanvas" />
-              <div className="ccdScanLine" />
-              <div className="ccdVideoNoise" />
-              <div className="ccdVideoCenter">
-                <div className="ccdReticle" />
+              <div className="ccdDetectionLayer" aria-hidden="true">
+                {overlayDetections.map((item, index) => (
+                  <div
+                    key={`${item.className}-${item.left}-${item.top}-${index}`}
+                    className={running ? 'ccdDetectionBox ccdDetectionBoxStable' : 'ccdDetectionBox'}
+                    style={{
+                      left: `${item.left}px`,
+                      top: `${item.top}px`,
+                      width: `${item.width}px`,
+                      height: `${item.height}px`,
+                    }}
+                  >
+                    <div className="ccdDetectionLabel">
+                      <span>{item.className || '眼镜目标'}</span>
+                      <span>{Math.round((item.confidence || 0) * 100)}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className={running ? 'ccdScanLine ccdScanLineMuted' : 'ccdScanLine'} />
+              <div className={running ? 'ccdVideoNoise ccdVideoNoiseMuted' : 'ccdVideoNoise'} />
+              {!cameraReady ? (
+                <div className="ccdVideoCenter">
                 <div className="ccdVideoHint">
-                  <div className="ccdHintTitle">{cameraReady ? '摄像头已接入' : '等待接入班级摄像头'}</div>
+                    <div className="ccdHintTitle">等待接入班级摄像头</div>
                   <div className="ccdHintDesc">
-                    {cameraReady
-                      ? '页面会实时显示班级摄像头画面，并使用基于 glassess 数据集训练的模型更新戴眼镜人数'
-                      : '点击“启动检测”后将申请浏览器摄像头权限，并开始实时推送到眼镜识别模型'}
+                      点击“启动检测”后将申请浏览器摄像头权限，并开始实时推送到眼镜识别模型
                   </div>
                 </div>
-              </div>
+                </div>
+              ) : null}
               <div className="ccdOverlay">
                 <div className="ccdOverlayItem">
                   <div className="ccdOverlayKey">实时状态</div>
@@ -678,6 +868,10 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
                 <div className="ccdOverlayItem">
                   <div className="ccdOverlayKey">连接</div>
                   <div className="ccdOverlayVal">{wsStatus}</div>
+                </div>
+                <div className="ccdOverlayItem">
+                  <div className="ccdOverlayKey">黄色框</div>
+                  <div className="ccdOverlayVal">{overlayDetections.length ? `${overlayDetections.length} 个目标` : '等待识别'}</div>
                 </div>
               </div>
             </div>
@@ -700,7 +894,7 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
               </div>
               <div className="ccdMetricSub">
                 <div className="ccdMetricSubKey">检测来源</div>
-                <div className="ccdMetricSubVal">{running ? '摄像头实时检测' : uploadResult ? '上传视频检测' : '待机'}</div>
+                <div className="ccdMetricSubVal">{running ? '摄像头实时检测' : uploadResult ? '上传图片检测' : '待机'}</div>
               </div>
               <div className="ccdMetricSub">
                 <div className="ccdMetricSubKey">识别目标总数</div>
@@ -716,46 +910,6 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
                   <div className="ccdErrorDesc">{errorText}</div>
                 </div>
               ) : null}
-            </div>
-          </Card>
-
-          <Card className="ccdUploadCard" variant="borderless">
-            <div className="ccdUploadHead">
-              <div>
-                <div className="ccdUploadTitle">上传文件检测</div>
-                <div className="ccdUploadDesc">上传视频后调用现有接口完成一次性检测</div>
-              </div>
-              <Tag color="blue">HTTP 接口</Tag>
-            </div>
-            <div className="ccdUploadActions">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="video/*"
-                className="ccdFileInput"
-                onChange={(event) => {
-                  const file = event.target.files?.[0] ?? null
-                  setManualFile(file)
-                }}
-              />
-              <Button onClick={() => fileInputRef.current?.click()}>
-                {manualFile ? '重新选择视频' : '选择视频'}
-              </Button>
-              <Button type="primary" loading={uploadLoading} onClick={() => void handleUploadDetect()}>
-                开始检测
-              </Button>
-            </div>
-            <div className="ccdUploadMeta">
-              <div className="ccdUploadMetaItem">
-                <span className="ccdUploadMetaKey">当前文件</span>
-                <span className="ccdUploadMetaVal">{manualFile?.name || '未选择文件'}</span>
-              </div>
-              <div className="ccdUploadMetaItem">
-                <span className="ccdUploadMetaKey">最近结果</span>
-                <span className="ccdUploadMetaVal">
-                  {uploadResult ? `${uploadResult.fileName} · ${uploadResult.totalDetections} 个目标` : '暂无'}
-                </span>
-              </div>
             </div>
           </Card>
 
@@ -812,6 +966,130 @@ export default function ClassCameraDetectPage({ classInfo, onBack }) {
           </Card>
         </div>
       </div>
+
+      <Card className="ccdUploadCard ccdUploadCardWide" variant="borderless">
+        <div className="ccdUploadHead">
+          <div>
+            <div className="ccdUploadTitle">图片文件检测演示</div>
+            <div className="ccdUploadDesc">左边上传课堂图片，右边展示识别框与结果摘要，适合答辩演示单张图检测流程</div>
+          </div>
+          <Tag color="blue">图片演示</Tag>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="ccdFileInput"
+          onChange={(event) => {
+            const file = event.target.files?.[0] ?? null
+            if (!file) {
+              setManualFile(null)
+              return
+            }
+            if (!file.type.startsWith('image/')) {
+              message.warning('这里只支持上传图片文件')
+              event.target.value = ''
+              return
+            }
+            setManualFile(file)
+            setUploadResult(null)
+            setErrorText('')
+          }}
+        />
+
+        <div className="ccdUploadWorkbench">
+          <div className="ccdUploadPanel">
+            <div className="ccdUploadPanelHead">
+              <div className="ccdUploadPanelLabel">左侧原图</div>
+              <div className="ccdUploadPanelHint">{manualFile ? '图片已载入' : '等待上传'}</div>
+            </div>
+            <div className="ccdUploadViewport">
+              {manualPreviewUrl ? (
+                <img src={manualPreviewUrl} alt="待检测图片" className="ccdUploadImage" />
+              ) : (
+                <div className="ccdUploadEmpty">
+                  <div className="ccdUploadEmptyTitle">选择一张图片开始演示</div>
+                  <div className="ccdUploadEmptyDesc">建议上传课堂照片或佩戴眼镜的人像图片，结果会更直观</div>
+                </div>
+              )}
+            </div>
+            <div className="ccdUploadActions">
+              <Button onClick={() => fileInputRef.current?.click()}>
+                {manualFile ? '重新选择图片' : '选择图片'}
+              </Button>
+              <Button type="primary" loading={uploadLoading} onClick={() => void handleUploadDetect()}>
+                开始检测
+              </Button>
+            </div>
+            <div className="ccdUploadMeta">
+              <div className="ccdUploadMetaItem">
+                <span className="ccdUploadMetaKey">当前文件</span>
+                <span className="ccdUploadMetaVal">{manualFile?.name || '未选择图片'}</span>
+              </div>
+              <div className="ccdUploadMetaItem">
+                <span className="ccdUploadMetaKey">当前状态</span>
+                <span className="ccdUploadMetaVal">{uploadLoading ? '识别中' : manualFile ? '待开始检测' : '等待上传'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="ccdUploadPanel ccdUploadPanelResult">
+            <div className="ccdUploadPanelHead">
+              <div className="ccdUploadPanelLabel">右侧结果</div>
+              <div className="ccdUploadPanelHint">{uploadResult ? `${uploadResult.totalDetections} 个目标` : '等待识别结果'}</div>
+            </div>
+            <div ref={uploadViewportRef} className="ccdUploadViewport ccdUploadViewportResult">
+              {manualPreviewUrl ? <img src={manualPreviewUrl} alt="检测结果图片" className="ccdUploadImage" /> : null}
+              {manualPreviewUrl && uploadOverlayDetections.length > 0 ? (
+                <div className="ccdUploadDetectionLayer" aria-hidden="true">
+                  {uploadOverlayDetections.map((item, index) => (
+                    <div
+                      key={`${item.className}-${item.left}-${item.top}-${index}`}
+                      className="ccdUploadDetectionBox"
+                      style={{
+                        left: `${item.left}px`,
+                        top: `${item.top}px`,
+                        width: `${item.width}px`,
+                        height: `${item.height}px`,
+                      }}
+                    >
+                      <div className="ccdUploadDetectionLabel">
+                        <span>{item.className || '眼镜目标'}</span>
+                        <span>{Math.round((item.confidence || 0) * 100)}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {!manualPreviewUrl ? (
+                <div className="ccdUploadEmpty">
+                  <div className="ccdUploadEmptyTitle">结果区待命</div>
+                  <div className="ccdUploadEmptyDesc">检测完成后，这里会叠加识别框，方便左右对照讲解</div>
+                </div>
+              ) : null}
+            </div>
+            <div className="ccdUploadSummary">
+              <div className="ccdUploadSummaryItem">
+                <div className="ccdUploadSummaryKey">戴眼镜人数</div>
+                <div className="ccdUploadSummaryVal">{uploadResult ? uploadResult.count : '-'}</div>
+              </div>
+              <div className="ccdUploadSummaryItem">
+                <div className="ccdUploadSummaryKey">识别目标总数</div>
+                <div className="ccdUploadSummaryVal">{uploadResult ? uploadResult.totalDetections : '-'}</div>
+              </div>
+              <div className="ccdUploadSummaryItem">
+                <div className="ccdUploadSummaryKey">类别分布</div>
+                <div className="ccdUploadSummaryVal">{uploadResult ? formatClassCounts(uploadResult.classCounts) : '等待检测'}</div>
+              </div>
+              <div className="ccdUploadSummaryItem">
+                <div className="ccdUploadSummaryKey">结果时间</div>
+                <div className="ccdUploadSummaryVal">{uploadResult ? formatTime(uploadResult.detectedAt) : '暂无'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   )
 }

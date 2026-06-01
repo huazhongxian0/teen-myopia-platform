@@ -8,6 +8,7 @@ import {
   FileTextOutlined,
   SearchOutlined,
   UnorderedListOutlined,
+  WarningOutlined,
 } from '@ant-design/icons'
 import { useAccount } from '../../hooks/useAccount.js'
 import EyeCareTipsPanel from '../../components/EyeCareTipsPanel.jsx'
@@ -140,6 +141,29 @@ export default function DoctorPage({ onLogout }) {
                             <Text strong className="actionTitle">诊断报告</Text>
                             <Text type="secondary" className="actionDesc">
                               查看当前医生名下病人档案
+                            </Text>
+                          </div>
+                          <div className="actionArrow">→</div>
+                        </div>
+                      </Card>
+                    </Col>
+                  </Row>
+                  <Row gutter={[20, 20]} style={{ marginTop: 20 }}>
+                    <Col xs={24} md={8}>
+                      <Card
+                        className="actionCard"
+                        hoverable
+                        variant="borderless"
+                        onClick={() => navigate('/doctor/riskWarning')}
+                      >
+                        <div className="actionCardInner">
+                          <div className="actionIconBox actionIconBox-orange">
+                            <WarningOutlined className="actionIcon" />
+                          </div>
+                          <div className="actionContent">
+                            <Text strong className="actionTitle">风险干预</Text>
+                            <Text type="secondary" className="actionDesc">
+                              查看和处理需要干预的视力风险预警
                             </Text>
                           </div>
                           <div className="actionArrow">→</div>

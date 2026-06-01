@@ -14,6 +14,10 @@ const DoctorRegistrationPage = lazy(() => import('./DoctorRegistrationPage/index
 const DoctorAppointmentAllPage = lazy(() => import('./DoctorAppointmentAllPage/index.jsx'))
 const DoctorArchivesPage = lazy(() => import('./DoctorArchivesPage/index.jsx'))
 const StudentArchivePage = lazy(() => import('./StudentArchivePage/index.jsx'))
+const RiskWarningStudentPage = lazy(() => import('./RiskWarningStudentPage/index.jsx'))
+const RiskWarningTeacherPage = lazy(() => import('./RiskWarningTeacherPage/index.jsx'))
+const RiskWarningDoctorPage = lazy(() => import('./RiskWarningDoctorPage/index.jsx'))
+const RiskWarningAdminPage = lazy(() => import('./RiskWarningAdminPage/index.jsx'))
 
 function OutletLoading() {
   return (
@@ -142,6 +146,46 @@ export default function AppRoutes({ authChecking, accessToken, account, onLoginS
           <RequireRole account={account} roleId="student">
             <StudentArchivePage onLogout={onLogout} />
           </RequireRole>
+        </RequireAuth>
+      ),
+    },
+    {
+      path: '/student/riskWarning',
+      element: (
+        <RequireAuth authChecking={authChecking} accessToken={accessToken}>
+          <RequireRole account={account} roleId="student">
+            <RiskWarningStudentPage onLogout={onLogout} />
+          </RequireRole>
+        </RequireAuth>
+      ),
+    },
+    {
+      path: '/teacher/riskWarning',
+      element: (
+        <RequireAuth authChecking={authChecking} accessToken={accessToken}>
+          <RequireRole account={account} roleId="teacher">
+            <RiskWarningTeacherPage onLogout={onLogout} />
+          </RequireRole>
+        </RequireAuth>
+      ),
+    },
+    {
+      path: '/doctor/riskWarning',
+      element: (
+        <RequireAuth authChecking={authChecking} accessToken={accessToken}>
+          <RequireRole account={account} roleId="doctor">
+            <RiskWarningDoctorPage onLogout={onLogout} />
+          </RequireRole>
+        </RequireAuth>
+      ),
+    },
+    {
+      path: '/manager/riskWarning',
+      element: (
+        <RequireAuth authChecking={authChecking} accessToken={accessToken}>
+          <RequireAdmin account={account}>
+            <RiskWarningAdminPage onLogout={onLogout} />
+          </RequireAdmin>
         </RequireAuth>
       ),
     },

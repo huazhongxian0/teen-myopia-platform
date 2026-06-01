@@ -1,0 +1,122 @@
+@startuml 预约管理模块E-R图（Chen表示法）
+
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+' 去掉stereotype标签显示
+skinparam stereotypePosition none
+
+' 样式
+skinparam rectangle {
+    BackgroundColor #BBDEFB
+    BorderColor #1565C0
+    RoundCorner 0
+    FontSize 13
+    FontStyle bold
+    MinimumWidth 70
+    MinimumHeight 35
+}
+
+skinparam usecase {
+    BackgroundColor #FFF9C4
+    BorderColor #F57F17
+    FontSize 10
+    MinimumWidth 40
+    MinimumHeight 25
+}
+
+skinparam hexagon {
+    BackgroundColor #C8E6C9
+    BorderColor #2E7D32
+    FontSize 11
+    MinimumWidth 40
+    MinimumHeight 30
+}
+
+' 紧凑参数
+skinparam nodesep 10
+skinparam ranksep 15
+skinparam linetype ortho
+skinparam padding 1
+skinparam margin 0
+
+' ==================== 实体定义 ====================
+rectangle "学校" as E_School
+usecase "id" as S_id
+usecase "name" as S_name
+usecase "table_name" as S_table
+E_School -- S_id
+E_School -- S_name
+E_School -- S_table
+
+rectangle "班级" as E_Class
+usecase "id" as C_id
+usecase "name" as C_name
+usecase "class_table" as C_table
+E_Class -- C_id
+E_Class -- C_name
+E_Class -- C_table
+
+rectangle "班级学生" as E_CS
+usecase "id" as CS_id
+usecase "account_id" as CS_account
+E_CS -- CS_id
+E_CS -- CS_account
+
+rectangle "账号" as E_Account
+usecase "id" as A_id
+usecase "role_id" as A_role
+usecase "name" as A_name
+E_Account -- A_id
+E_Account -- A_role
+E_Account -- A_name
+
+rectangle "就诊登记" as E_VR
+usecase "id" as VR_id
+usecase "doctor_id" as VR_doc
+usecase "patient_id" as VR_pat
+usecase "visit_date" as VR_date
+E_VR -- VR_id
+E_VR -- VR_doc
+E_VR -- VR_pat
+E_VR -- VR_date
+
+rectangle "就诊历史" as E_VH
+usecase "id" as VH_id
+usecase "reg_id" as VH_reg
+usecase "od" as VH_od
+usecase "os" as VH_os
+E_VH -- VH_id
+E_VH -- VH_reg
+E_VH -- VH_od
+E_VH -- VH_os
+
+' ==================== 关系菱形 ====================
+hexagon "包含" as R1
+hexagon "包含" as R2
+hexagon "挂接" as R3
+hexagon "预约" as R4
+hexagon "就诊" as R5
+hexagon "生成" as R6
+
+' 关系连线
+E_School "1" -- "N" R1
+R1 "N" -- "1" E_Class
+
+E_Class "1" -- "N" R2
+R2 "N" -- "1" E_CS
+
+E_CS "N" -- "1" R3
+R3 "1" -- "1" E_Account
+
+E_Account "1" -- "N" R4
+R4 "N" -- "1" E_VR
+
+E_Account "1" -- "N" R5
+R5 "N" -- "1" E_VH
+
+E_VR "1" -- "0..1" R6
+R6 "0..1" -- "1" E_VH
+
+@enduml

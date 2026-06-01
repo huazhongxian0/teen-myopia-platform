@@ -289,3 +289,32 @@ SELECT 0, 0, CAST(UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000 AS UNSIGNED), 0, a
 FROM `account` a
 WHERE a.`account_name` = 'student'
   AND NOT EXISTS (SELECT 1 FROM `eyessight` e WHERE e.`people_id` = a.`id`);
+
+CREATE TABLE IF NOT EXISTS `risk_warning` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `student_account_id` BIGINT NOT NULL,
+  `level` VARCHAR(32) NOT NULL,
+  `trigger_type` VARCHAR(32) NOT NULL,
+  `trigger_reason` VARCHAR(1024) NOT NULL,
+  `status` VARCHAR(32) NOT NULL DEFAULT '未处置',
+  `created_at` BIGINT NOT NULL,
+  `resolved_at` BIGINT NULL,
+  `resolver_account_id` BIGINT NULL,
+  `resolution_note` VARCHAR(1024) NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_risk_warning_student` (`student_account_id`),
+  KEY `idx_risk_warning_level` (`level`),
+  KEY `idx_risk_warning_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `risk_warning_message` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `warning_id` BIGINT NOT NULL,
+  `receiver_account_id` BIGINT NOT NULL,
+  `receiver_role` VARCHAR(32) NOT NULL,
+  `read_status` BOOLEAN NOT NULL DEFAULT 0,
+  `created_at` BIGINT NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_rwm_receiver` (`receiver_account_id`),
+  KEY `idx_rwm_warning` (`warning_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

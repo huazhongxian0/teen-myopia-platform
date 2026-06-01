@@ -49,6 +49,17 @@ export default function ShortcutSection({ canManage }) {
                 </div>
               </Card>
             </Col>
+            <Col xs={24} md={12}>
+              <Card bordered={false} className="softCard lift" bodyStyle={{ padding: 0 }}>
+                <div className="shortcutCardBody">
+                  <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                    <Text strong className="shortcutTitle">风险预警总览</Text>
+                    <Text type="secondary" className="shortcutDescription">全局查看平台视力风险预警数据与统计图表。</Text>
+                    <Button size="middle" type="primary" className="primaryGlow" onClick={() => navigate('/manager/riskWarning')}>进入</Button>
+                  </Space>
+                </div>
+              </Card>
+            </Col>
           </Row>
         </Space>
       </div>

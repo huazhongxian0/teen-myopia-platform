@@ -1,0 +1,111 @@
+@startuml 风险预警模块类图
+
+skinparam classAttributeIconSize 0
+
+title 风险预警模块核心类图
+
+package "model" {
+  class RiskWarning {
+    - Long id
+    - Long studentAccountId
+    - String level
+    - String triggerType
+    - String triggerReason
+    - String status
+    - Long createdAt
+    - Long resolvedAt
+    - Long resolverAccountId
+    - String resolutionNote
+    + getters/setters
+  }
+
+  class RiskWarningMessage {
+    - Long id
+    - Long warningId
+    - Long receiverAccountId
+    - String receiverRole
+    - Boolean readStatus
+    - Long createdAt
+    + getters/setters
+  }
+}
+
+package "repository" {
+  interface RiskWarningRepository <<JpaRepository>> {
+    + findByStudentAccountIdOrderByIdDesc()
+    + countByStudentAccountId()
+    + findByLevelAndStatusOrderByIdDesc()
+    + countByLevel()
+    + countByStatus()
+  }
+
+  interface RiskWarningMessageRepository <<JpaRepository>> {
+    + findByReceiverAccountIdOrderByIdDesc()
+    + countByReceiverAccountIdAndReadStatus()
+    + findByWarningIdInOrderByIdDesc()
+  }
+}
+
+package "dto" {
+  class RiskWarningDto {
+    + record RiskWarningItem
+    + record RiskWarningMessageItem
+    + record EvaluateRequest/Response
+    + record ListMyWarningsRequest/Response
+    + record ListMyMessagesRequest/Response
+    + record ReadMessageRequest/Response
+    + record ResolveWarningRequest/Response
+    + record ClassWarningListRequest/Response
+    + record AdminOverviewResponse
+  }
+}
+
+package "service" {
+  class RiskWarningService {
+    - RiskWarningRepository riskWarningRepository
+    - RiskWarningMessageRepository riskWarningMessageRepository
+    - AccountRepository accountRepository
+    - VisitHistoryRepository visitHistoryRepository
+    - JdbcTemplate jdbcTemplate
+    + evaluateAndWarn(Long): EvaluateResponse
+    + batchEvaluate(Long): BatchEvaluateResponse
+    + listMyWarnings(Long, ListMyWarningsRequest): ListMyWarningsResponse
+    + listMyMessages(Long, ListMyMessagesRequest): ListMyMessagesResponse
+    + readMessage(Long, ReadMessageRequest): ReadMessageResponse
+    + resolveWarning(Long, ResolveWarningRequest): ResolveWarningResponse
+    + listClassWarnings(Long, ClassWarningListRequest): ClassWarningListResponse
+    + adminOverview(): AdminOverviewResponse
+    - computeTrigger(EyeSightInfo, List): TriggerResult
+    - checkThreshold(EyeSightInfo): TriggerResult
+    - checkTrend(List): TriggerResult
+    - checkOverdue(List): TriggerResult
+    - pushWarningMessages(RiskWarning, Long)
+  }
+}
+
+package "controller" {
+  class RiskWarningController {
+    - AuthService authService
+    - RiskWarningService riskWarningService
+    + evaluate(): ResponseEntity
+    + batchEvaluate(): ResponseEntity
+    + listMine(): ResponseEntity
+    + listMyMessages(): ResponseEntity
+    + readMessage(): ResponseEntity
+    + resolve(): ResponseEntity
+    + listByClass(): ResponseEntity
+    + adminOverview(): ResponseEntity
+  }
+}
+
+RiskWarningController --> RiskWarningService
+RiskWarningController --> AuthService
+RiskWarningService --> RiskWarningRepository
+RiskWarningService --> RiskWarningMessageRepository
+RiskWarningService --> AccountRepository
+RiskWarningService --> VisitHistoryRepository
+RiskWarningService ..> RiskWarningDto
+RiskWarningRepository ..> RiskWarning
+RiskWarningMessageRepository ..> RiskWarningMessage
+
+@enduml

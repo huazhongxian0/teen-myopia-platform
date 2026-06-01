@@ -1,0 +1,58 @@
+@startuml 风险预警业务流程时序图
+
+skinparam sequenceMessageAlign center
+
+title 风险预警"监测—识别—预警—干预"业务闭环时序图
+
+actor "医生/教师" as operator
+participant "VisitHistoryController" as vhc
+participant "RiskWarningController" as rwc
+participant "VisitService" as vs
+participant "RiskWarningService" as rws
+participant "RiskWarningRepository" as rwrepo
+participant "RiskWarningMessageRepository" as rwmrepo
+database "MySQL" as db
+
+== 视力数据录入 ==
+operator -> vhc : POST /api/visitHistory/create
+vhc -> vs : createVisitHistory(doctorId, req)
+vs -> db : INSERT visit_history
+vs -> db : UPDATE eyessight
+vs --> vhc : 返回就诊记录ID
+vhc --> operator : 录入成功
+
+== 风险识别与判定 ==
+operator -> rwc : POST /api/riskWarning/evaluate
+rwc -> rws : evaluateAndWarn(studentId)
+activate rws
+rws -> db : SELECT eyessight
+rws -> db : SELECT visit_history
+rws -> rws : 阈值规则判定
+rws -> rws : 趋势规则判定
+rws -> rws : 超期规则判定
+rws -> rwrepo : save(riskWarning)
+rwrepo -> db : INSERT risk_warning
+rws -> rws : 定向消息推送
+rws -> rwmrepo : saveAll(messages)
+rwmrepo -> db : INSERT risk_warning_message
+rws --> rwc : 返回预警结果
+rwc --> operator : 预警生成成功
+
+== 预警查看与处置 ==
+operator -> rwc : POST /api/riskWarning/listMyMessages
+rwc -> rws : listMyMessages(accountId, req)
+rws -> rwmrepo : findByReceiverAccountId
+rwmrepo -> db : SELECT risk_warning_message
+rws --> rwc : 返回消息列表
+rwc --> operator : 展示预警消息
+
+operator -> rwc : POST /api/riskWarning/resolve
+rwc -> rws : resolveWarning(resolverId, req)
+rws -> rwrepo : 更新status为已处置
+rwrepo -> db : UPDATE risk_warning
+rws --> rwc : 处置成功
+rwc --> operator : 返回确认
+
+deactivate rws
+
+@enduml

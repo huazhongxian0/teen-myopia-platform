@@ -5,12 +5,21 @@
   padding: 14px;
   border-radius: 18px;
   overflow: hidden;
+  isolation: isolate;
+  contain: paint;
   background:
     radial-gradient(1100px 520px at 8% 10%, rgba(91, 61, 245, 0.24), rgba(255, 255, 255, 0) 60%),
     radial-gradient(1000px 520px at 88% 18%, rgba(47, 107, 255, 0.22), rgba(255, 255, 255, 0) 60%),
     linear-gradient(180deg, rgba(248, 250, 252, 0.86), rgba(241, 245, 249, 0.94));
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+}
+
+.ccdRootRunning {
+  background:
+    radial-gradient(900px 420px at 10% 10%, rgba(91, 61, 245, 0.16), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(820px 420px at 88% 18%, rgba(47, 107, 255, 0.14), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.9), rgba(241, 245, 249, 0.96));
 }
 
 .ccdRoot::before {
@@ -33,6 +42,11 @@
   opacity: 0.35;
   pointer-events: none;
   z-index: 0;
+}
+
+.ccdRootRunning .ccdGlow {
+  filter: blur(42px);
+  opacity: 0.16;
 }
 
 .ccdGlowA {
@@ -186,6 +200,7 @@
   height: 420px;
   border-radius: 14px;
   overflow: hidden;
+  contain: paint;
   background:
     radial-gradient(1200px 560px at 30% 20%, rgba(91, 61, 245, 0.18), rgba(15, 23, 42, 0) 55%),
     radial-gradient(900px 520px at 80% 50%, rgba(47, 107, 255, 0.18), rgba(15, 23, 42, 0) 55%),
@@ -201,24 +216,107 @@
 .ccdVideoPlayer {
   position: absolute;
   inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background: #020617;
   filter: saturate(1.03) contrast(1.02);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
-.ccdCanvas {
-  display: none;
+.ccdDetectionLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.ccdDetectionBox {
+  position: absolute;
+  border: 2px solid rgba(250, 204, 21, 0.96);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px rgba(120, 53, 15, 0.52) inset,
+    0 0 0 4px rgba(250, 204, 21, 0.14),
+    0 14px 28px rgba(250, 204, 21, 0.24);
+  background: linear-gradient(180deg, rgba(250, 204, 21, 0.08), rgba(250, 204, 21, 0.02));
+  animation: ccdDetectionPulse 1.25s ease-out infinite;
+}
+
+.ccdDetectionBoxStable {
+  animation: none;
+}
+
+.ccdDetectionBox::before,
+.ccdDetectionBox::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: rgba(250, 204, 21, 0.98);
+  border-style: solid;
+}
+
+.ccdDetectionBox::before {
+  top: -2px;
+  left: -2px;
+  border-width: 3px 0 0 3px;
+  border-top-left-radius: 12px;
+}
+
+.ccdDetectionBox::after {
+  right: -2px;
+  bottom: -2px;
+  border-width: 0 3px 3px 0;
+  border-bottom-right-radius: 12px;
+}
+
+.ccdDetectionLabel {
+  position: absolute;
+  top: -14px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.98), rgba(245, 158, 11, 0.96));
+  color: rgba(69, 26, 3, 0.96);
+  box-shadow: 0 12px 24px rgba(245, 158, 11, 0.28);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+@keyframes ccdDetectionPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.01);
+    opacity: 1;
+  }
 }
 
 .ccdScanLine {
   position: absolute;
   inset: -20% 0 auto 0;
+  z-index: 2;
   height: 120px;
   background: linear-gradient(180deg, rgba(91, 61, 245, 0), rgba(91, 61, 245, 0.18), rgba(91, 61, 245, 0));
   animation: ccdScan 3.2s linear infinite;
   mix-blend-mode: screen;
   opacity: 0.7;
+}
+
+.ccdScanLineMuted {
+  opacity: 0.18;
 }
 
 @keyframes ccdScan {
@@ -229,12 +327,17 @@
 .ccdVideoNoise {
   position: absolute;
   inset: 0;
+  z-index: 2;
   opacity: 0.08;
   background-image:
     radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.5) 0 1px, transparent 1px),
     radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.35) 0 1px, transparent 1px);
   background-size: 22px 22px, 28px 28px;
   animation: ccdNoise 6s ease-in-out infinite;
+}
+
+.ccdVideoNoiseMuted {
+  opacity: 0.02;
 }
 
 @keyframes ccdNoise {
@@ -245,49 +348,25 @@
 .ccdVideoCenter {
   position: absolute;
   inset: 0;
+  z-index: 5;
   display: grid;
   place-items: center;
   padding: 18px;
 }
 
-.ccdReticle {
-  width: min(62%, 420px);
-  height: min(42%, 260px);
-  border-radius: 18px;
-  border: 1px solid rgba(91, 61, 245, 0.42);
-  box-shadow:
-    0 0 0 1px rgba(15, 23, 42, 0.45) inset,
-    0 0 40px rgba(91, 61, 245, 0.18);
-  position: relative;
-}
-
-.ccdReticle::before,
-.ccdReticle::after {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border-radius: 14px;
-  border: 1px dashed rgba(47, 107, 255, 0.42);
-  opacity: 0.9;
-}
-
-.ccdReticle::after {
-  inset: 22px;
-  border-style: solid;
-  border-color: rgba(91, 61, 245, 0.22);
-  opacity: 0.7;
-}
-
 .ccdVideoHint {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
+  position: relative;
   max-width: 520px;
   padding: 12px 14px;
   border-radius: 14px;
   background: rgba(2, 6, 23, 0.55);
   border: 1px solid rgba(148, 163, 184, 0.22);
   backdrop-filter: blur(14px);
+}
+
+.ccdRootRunning .ccdVideoHint {
+  backdrop-filter: none;
+  background: rgba(2, 6, 23, 0.72);
 }
 
 .ccdHintTitle {
@@ -307,6 +386,7 @@
   position: absolute;
   top: 18px;
   right: 18px;
+  z-index: 6;
   display: grid;
   gap: 10px;
 }
@@ -318,6 +398,11 @@
   background: rgba(2, 6, 23, 0.45);
   border: 1px solid rgba(148, 163, 184, 0.18);
   backdrop-filter: blur(14px);
+}
+
+.ccdRootRunning .ccdOverlayItem {
+  backdrop-filter: none;
+  background: rgba(2, 6, 23, 0.68);
 }
 
 .ccdOverlayKey {
@@ -501,6 +586,193 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: right;
+}
+
+.ccdUploadCardWide {
+  margin-top: 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background:
+    radial-gradient(800px 280px at 6% 0%, rgba(91, 61, 245, 0.12), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(720px 260px at 100% 0%, rgba(47, 107, 255, 0.12), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.96));
+}
+
+.ccdUploadCardWide .ant-card-body {
+  padding: 16px;
+}
+
+.ccdUploadWorkbench {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.ccdUploadPanel {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.ccdUploadPanelResult {
+  background: linear-gradient(180deg, rgba(245, 247, 255, 0.95), rgba(235, 241, 255, 0.82));
+}
+
+.ccdUploadPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ccdUploadPanelLabel {
+  color: rgba(15, 23, 42, 0.88);
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.ccdUploadPanelHint {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: rgba(15, 23, 42, 0.6);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ccdUploadViewport {
+  position: relative;
+  min-height: 320px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.06)),
+    linear-gradient(135deg, rgba(148, 163, 184, 0.14), rgba(148, 163, 184, 0.06));
+  border: 1px dashed rgba(15, 23, 42, 0.14);
+}
+
+.ccdUploadViewportResult {
+  border-style: solid;
+  border-color: rgba(47, 107, 255, 0.18);
+  background:
+    radial-gradient(320px 180px at 100% 0%, rgba(47, 107, 255, 0.12), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(244, 247, 255, 0.96));
+}
+
+.ccdUploadImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.ccdUploadEmpty {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  text-align: center;
+}
+
+.ccdUploadEmptyTitle {
+  color: rgba(15, 23, 42, 0.84);
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.ccdUploadEmptyDesc {
+  margin-top: 8px;
+  color: rgba(15, 23, 42, 0.56);
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+.ccdUploadDetectionLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ccdUploadDetectionBox {
+  position: absolute;
+  border: 2px solid rgba(47, 107, 255, 0.95);
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px rgba(12, 74, 110, 0.4) inset,
+    0 0 0 4px rgba(47, 107, 255, 0.12),
+    0 16px 30px rgba(47, 107, 255, 0.2);
+  background: linear-gradient(180deg, rgba(47, 107, 255, 0.08), rgba(47, 107, 255, 0.02));
+}
+
+.ccdUploadDetectionLabel {
+  position: absolute;
+  top: -14px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(47, 107, 255, 0.98), rgba(91, 61, 245, 0.98));
+  color: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 24px rgba(47, 107, 255, 0.25);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.ccdUploadSummary {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ccdUploadSummaryItem {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(47, 107, 255, 0.12);
+}
+
+.ccdUploadSummaryKey {
+  color: rgba(15, 23, 42, 0.56);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ccdUploadSummaryVal {
+  margin-top: 6px;
+  color: rgba(15, 23, 42, 0.84);
+  font-weight: 900;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+@media (max-width: 1100px) {
+  .ccdUploadWorkbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ccdUploadViewport,
+  .ccdUploadImage,
+  .ccdUploadEmpty {
+    min-height: 260px;
+  }
+
+  .ccdUploadSummary {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .ccdHistoryCard .ant-card-head {
